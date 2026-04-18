@@ -16,7 +16,6 @@
     "chart.js": "^4.4.0",
     "vue-chartjs": "^5.3.0",
     "leaflet": "^1.9.0",
-    "vue-leaflet": "^0.10.0",
     "primevue": "^3.49.0",
     "primeicons": "^7.0.0"
   },

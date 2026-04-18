@@ -103,7 +103,7 @@ etl:
 	@echo "📦 Installing Python dependencies..."
 	cd etl-python && pip install -r requirements.txt
 	@echo "📊 Importing sample data..."
-	cd etl-python && python scripts/dwd_importer.py --init-db --import-all
+	cd etl-python && python3 scripts/dwd_importer.py --init-db --import-all
 	@echo "✅ ETL import completed"
 
 # Test commands

@@ -1,7 +1,7 @@
 # Weather History DWD - Makefile for local development
 # Usage: make [target]
 
-.PHONY: help start stop restart build clean logs db-shell frontend backend etl test
+.PHONY: help start stop restart build clean logs db-shell frontend backend etl test dev prod-sim health install update
 
 # Default target
 help:
@@ -21,6 +21,8 @@ help:
 	@echo "  make frontend     - Start Vue.js frontend development server"
 	@echo "  make backend      - Start Laravel backend development server"
 	@echo "  make etl          - Run Python ETL import (sample data)"
+	@echo "  make dev          - Quick start: start all services (docker + backend + frontend)"
+	@echo "  make prod-sim     - Production simulation (build and start all services)"
 	@echo ""
 	@echo "🧪 Test Commands:"
 	@echo "  make test         - Run all tests"
@@ -32,6 +34,11 @@ help:
 	@echo "  make db-reset     - Reset database (drop & recreate)"
 	@echo "  make db-backup    - Create database backup"
 	@echo "  make db-restore   - Restore database from backup"
+	@echo ""
+	@echo "🔍 Utility Commands:"
+	@echo "  make health       - Check health of all services"
+	@echo "  make install      - Install all dependencies (PHP, Node.js, Python)"
+	@echo "  make update       - Update all dependencies"
 	@echo ""
 	@echo "🌐 URLs:"
 	@echo "  Frontend:    http://localhost:3000"

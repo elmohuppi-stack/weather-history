@@ -11,7 +11,7 @@
             <div>
               <router-link to="/" class="group">
                 <h1 class="text-2xl font-bold text-gradient tracking-tight">
-                  {{ $t('app.title') }} <span class="text-primary-700">DWD</span>
+                  {{ $t('app.title') }}
                 </h1>
                 <p class="text-sm text-gray-500 mt-1 group-hover:text-primary-600 transition-colors">
                   {{ $t('app.subtitle') }}

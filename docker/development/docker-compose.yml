@@ -1,0 +1,133 @@
+version: '3.8'
+
+services:
+  # PostgreSQL mit PostGIS
+  postgres:
+    image: postgis/postgis:15-3.4
+    container_name: weather-postgres-dev
+    environment:
+      POSTGRES_DB: weather_history
+      POSTGRES_USER: weather_user
+      POSTGRES_PASSWORD: weather_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - weather-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U weather_user -d weather_history"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis für Caching und Queues
+  redis:
+    image: redis:7-alpine
+    container_name: weather-redis-dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - weather-network
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Laravel Backend (PHP + Nginx)
+  laravel-backend:
+    build:
+      context: ../../laravel-backend
+      dockerfile: ../docker/development/Dockerfile.laravel
+    container_name: weather-laravel-dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:80"
+    volumes:
+      - ../../laravel-backend:/var/www/html
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: weather_history
+      DB_USERNAME: weather_user
+      DB_PASSWORD: weather_password
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      APP_URL: http://localhost:8000
+      API_URL: http://localhost:8000/api
+    networks:
+      - weather-network
+    restart: unless-stopped
+
+  # Vue.js Frontend (Node + Nginx)
+  vue-frontend:
+    build:
+      context: ../../vue-frontend
+      dockerfile: ../docker/development/Dockerfile.vue
+    container_name: weather-vue-dev
+    depends_on:
+      - laravel-backend
+    ports:
+      - "3000:80"
+    volumes:
+      - ../../vue-frontend:/app
+      - /app/node_modules
+    environment:
+      VITE_API_BASE_URL: http://localhost:8000/api
+      VITE_APP_NAME: "Weather History DWD"
+    networks:
+      - weather-network
+    restart: unless-stopped
+
+  # Python ETL Service
+  python-etl:
+    build:
+      context: ../../etl-python
+      dockerfile: ../docker/development/Dockerfile.python
+    container_name: weather-python-etl-dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ../../etl-python:/app
+      - ./data:/data
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: weather_history
+      DB_USER: weather_user
+      DB_PASSWORD: weather_password
+    networks:
+      - weather-network
+    restart: "no"
+
+  # Adminer für Datenbank-Verwaltung
+  adminer:
+    image: adminer:latest
+    container_name: weather-adminer-dev
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+    networks:
+      - weather-network
+
+networks:
+  weather-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:

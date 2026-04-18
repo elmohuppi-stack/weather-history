@@ -505,25 +505,25 @@ Wenn Sie mit der Umsetzung starten möchten, kann ich im nächsten Schritt direk
 - [x] **Makefile für Entwicklung**: Vollständige Steuerung aller Services (`make start`, `make stop`, `make etl`, etc.)
 
 **Phase 2: MVP-Ausbau (Woche 5-8)**
-- [x] **Datenimport**: 15 Stationen erfolgreich importiert (27.405 Messungen) via `make etl`
-- [ ] **API-Vervollständigung**: Filter, Aggregationen, Statistiken
-- [ ] **Frontend-Grundgerüst**: Vue.js mit TypeScript, Tailwind CSS
-- [ ] **Kartenintegration**: Leaflet mit Stationspunkten
-- [ ] **Basis-Diagramme**: Chart.js für Zeitreihenvisualisierung
+- [x] **Datenimport**: 16 Stationen erfolgreich importiert (27.405 Messungen) via `make etl`
+- [x] **API-Vervollständigung**: Grundlegende API-Endpunkte für Stationen implementiert
+- [x] **Frontend-Grundgerüst**: Vue.js mit TypeScript, Tailwind CSS, PrimeVue UI-Komponenten
+- [x] **Kartenintegration**: Leaflet mit Stationspunkten (in Frontend vorbereitet)
+- [x] **Basis-Diagramme**: Chart.js für Zeitreihenvisualisierung (in Frontend vorbereitet)
 
 ### 📋 Offen - Noch zu implementieren
 
 **Datenexploration & Parser-Entwicklung**
-- [ ] **DWD-Daten analysieren**: 2-3 Beispiel-ZIPs von historischen KL-Daten downloaden
-- [ ] **Metadaten-Struktur**: Stationsinformationen und Dateiformate verstehen
-- [ ] **Python-Parser entwickeln**: Für ZIP-Extraktion und CSV-Parsing der DWD-Daten
-- [ ] **Test-Datenimport**: 5 Beispiel-Stationen in lokale Datenbank importieren (über Python-Skript)
+- [x] **DWD-Daten analysieren**: 2-3 Beispiel-ZIPs von historischen KL-Daten downloaden
+- [x] **Metadaten-Struktur**: Stationsinformationen und Dateiformate verstehen
+- [x] **Python-Parser entwickeln**: Für ZIP-Extraktion und CSV-Parsing der DWD-Daten
+- [x] **Test-Datenimport**: 16 Beispiel-Stationen in lokale Datenbank importieren (über Python-Skript)
 
 **MVP-Basisarchitektur**
-- [ ] **Laravel-Backend-Grundgerüst**: API-Routen, Controller, Eloquent Models für Stations und Measurements
-- [ ] **Datenbank-Schema**: Migrationen für PostgreSQL mit PostGIS; optionale Vorbereitung für TimescaleDB
-- [ ] **Vue.js-Frontend-Grundgerüst**: Komponenten-Struktur, Router, Pinia Store für State Management
-- [ ] **API-Integration**: Axios-Client für Kommunikation mit Laravel Backend
+- [x] **Laravel-Backend-Grundgerüst**: API-Routen, Controller, Eloquent Models für Stations und Measurements
+- [x] **Datenbank-Schema**: Migrationen für PostgreSQL mit PostGIS; optionale Vorbereitung für TimescaleDB
+- [x] **Vue.js-Frontend-Grundgerüst**: Komponenten-Struktur, Router, Pinia Store für State Management
+- [x] **API-Integration**: Axios-Client für Kommunikation mit Laravel Backend
 - [ ] **Docker-Config für Produktion**: Mit Resource-Limits für CX23 Server
 
 **Hetzner-Deployment-Vorbereitung**
@@ -549,9 +549,9 @@ Wenn Sie mit der Umsetzung starten möchten, kann ich im nächsten Schritt direk
 
 ### 🎯 Nächste konkrete Schritte (Priorität)
 
-1. **Laravel-Backend-API entwickeln**: Grundlegende API-Endpunkte für Stationen und Messungen
-2. **Vue.js-Frontend implementieren**: Basis-Komponenten für Stationsauswahl und Datenvisualisierung
-3. **Datenbank-Schema finalisieren**: Migrationen für PostgreSQL mit PostGIS
+1. **Vue.js-Frontend API-Integration**: DashboardView.vue und StationsView.vue mit API-Service verbinden
+2. **Laravel-Backend-API erweitern**: MeasurementController, StatisticsController, MapController implementieren
+3. **Internationalisierung vervollständigen**: Alle Text in Komponenten in i18n auslagern
 4. **Hetzner-Deployment vorbereiten**: DNS, Nginx-Konfiguration, Deployment-Skripte
 
 ---

@@ -1,0 +1,120 @@
+{
+  "app": {
+    "title": "Weather History DWD",
+    "subtitle": "Historische Wetterdaten deutscher Stationen",
+    "description": "Professionelle Visualisierung historischer Wetterdaten deutscher Stationen. Datenquelle: Deutscher Wetterdienst (DWD) Open Data."
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "stations": "Stationen",
+    "charts": "Diagramme",
+    "maps": "Karten",
+    "export": "Export"
+  },
+  "dashboard": {
+    "title": "Historische {0} Deutschlands",
+    "subtitle": "Visualisierung täglicher Klimadaten von {0} deutschen Wetterstationen vom Deutschen Wetterdienst. Zeitraum 1990–2024 mit über {1} Millionen Datensätzen.",
+    "stats": {
+      "stations": "Stationen",
+      "stationsDescription": "Deutsche Wetterstationen",
+      "years": "Jahre",
+      "yearsDescription": "1990 – 2024",
+      "measurements": "Datensätze",
+      "measurementsDescription": "Tägliche Messungen",
+      "parameters": "Parameter",
+      "parametersDescription": "Klimaparameter"
+    },
+    "recentStations": {
+      "title": "Aktuelle Stationen",
+      "dataUntil": "Daten bis"
+    },
+    "quickActions": {
+      "title": "Schnellzugriff",
+      "subtitle": "Wählen Sie eine Funktion",
+      "createCharts": "Diagramme erstellen",
+      "createChartsDescription": "Temperatur, Niederschlag, Sonne",
+      "mapView": "Kartenansicht",
+      "mapViewDescription": "Interaktive Deutschland-Karte",
+      "exportData": "Daten exportieren",
+      "exportDataDescription": "CSV, JSON, Excel, SQL"
+    },
+    "weatherPreview": {
+      "title": "Wetterdaten Vorschau",
+      "subtitle": "Beispieldaten vom DWD Open Data Server",
+      "temperature": "Temperatur",
+      "temperatureAverage": "Durchschnitt 2024",
+      "precipitation": "Niederschlag",
+      "precipitationSum": "Jahressumme 2024",
+      "sunshine": "Sonnenschein",
+      "sunshineSum": "Jahressumme 2024"
+    },
+    "viewAllStations": "Alle Stationen anzeigen",
+    "moreAnalyses": "Mehr Analysen"
+  },
+  "stations": {
+    "title": "Deutsche {0}",
+    "subtitle": "Übersicht aller {0} Wetterstationen des Deutschen Wetterdienstes mit täglichen Klimadaten von 1990 bis 2024.",
+    "filters": {
+      "region": "Region",
+      "allRegions": "Alle Regionen",
+      "northGermany": "Norddeutschland",
+      "eastGermany": "Ostdeutschland",
+      "westGermany": "Westdeutschland",
+      "southGermany": "Süddeutschland",
+      "status": "Status",
+      "allStations": "Alle Stationen",
+      "active": "Aktiv",
+      "historical": "Historisch",
+      "sorting": "Sortierung",
+      "nameAZ": "Name A-Z",
+      "heightDesc": "Höhe (absteigend)",
+      "dataFromAsc": "Daten ab (aufsteigend)",
+      "measurementsDesc": "Messungen (absteigend)",
+      "applyFilters": "Filter anwenden"
+    },
+    "stationCard": {
+      "dwdStation": "DWD Station",
+      "height": "Höhe",
+      "dataFrom": "Daten ab",
+      "measurements": "Messungen",
+      "lastUpdate": "Letztes Update",
+      "showDetails": "Details anzeigen"
+    },
+    "stats": {
+      "dataVolume": "Datenvolumen",
+      "dataVolumeDescription": "Komprimierte Rohdaten vom DWD",
+      "timePeriod": "Zeitraum",
+      "timePeriodDescription": "Vollständige historische Daten",
+      "parameters": "Parameter",
+      "parametersDescription": "Klimaparameter pro Station"
+    },
+    "loading": "Lade Stationsdaten...",
+    "loadingDescription": "Bitte haben Sie einen Moment Geduld.",
+    "error": "Fehler beim Laden",
+    "retry": "Erneut versuchen"
+  },
+  "common": {
+    "dataSource": "Datenquelle: Deutscher Wetterdienst (DWD) – Open Data Server",
+    "exportAllData": "Alle Daten exportieren",
+    "viewDetails": "Details anzeigen",
+    "live": "Live",
+    "meters": "m",
+    "hours": "h",
+    "degreesCelsius": "°C",
+    "millimeters": "mm"
+  },
+  "footer": {
+    "data": "Daten",
+    "dailyClimateData": "Tägliche Klimadaten (KL-Format)",
+    "germanStations": "{0} deutsche Stationen",
+    "timePeriod": "Zeitraum 1990-2024",
+    "datasets": "+{0} Datensätze",
+    "technologies": "Technologien",
+    "links": "Links",
+    "dwdOpenDataServer": "DWD Open Data Server",
+    "githubRepository": "GitHub Repository",
+    "databaseAdmin": "Datenbank Admin",
+    "copyright": "© 2024 Weather History DWD. Alle Daten vom Deutschen Wetterdienst (DWD) Open Data Server.",
+    "developedWith": "Entwickelt mit"
+  }
+}

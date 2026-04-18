@@ -89,7 +89,7 @@ opendata.dwd.de/
 
 ### Angepasster Scope für das MVP
 
-1. **Stationen**: 15-20 ausgewählte Hauptstationen (statt 400+)
+1. **Stationen**: 16 ausgewählte Hauptstationen (statt 400+)
 2. **Zeitraum**: 1990-2024 (34 Jahre statt 100+)
 3. **Parameter**: Kernparameter (Temperatur max/min/mittel, Niederschlag, Sonnenscheindauer)
 4. **Auflösung**: Nur tägliche Daten (KL-Format)

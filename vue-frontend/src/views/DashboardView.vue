@@ -6,7 +6,7 @@
         Historische <span class="text-gradient">Wetterdaten</span> Deutschlands
       </h1>
       <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-        Visualisierung täglicher Klimadaten von 15 deutschen Wetterstationen vom Deutschen Wetterdienst.
+        Visualisierung täglicher Klimadaten von 16 deutschen Wetterstationen vom Deutschen Wetterdienst.
         Zeitraum 1990–2024 mit über 2.3 Millionen Datensätzen.
       </p>
     </div>
@@ -21,7 +21,7 @@
             </div>
             <div>
               <p class="text-sm text-gray-500 font-medium mb-1">Stationen</p>
-              <p class="text-3xl font-bold text-gray-900">{{ stats.stations || '15' }}</p>
+              <p class="text-3xl font-bold text-gray-900">{{ stats.stations || '16' }}</p>
             </div>
           </div>
           <div class="mt-4 pt-4 border-t border-gray-100">
@@ -233,7 +233,7 @@ interface Stats {
 }
 
 const stats = ref<Stats>({
-  stations: 15,
+  stations: 16,
   years: 34,
   measurements: '2.3M',
   parameters: 8
@@ -241,10 +241,21 @@ const stats = ref<Stats>({
 
 const recentStations = ref<Station[]>([
   { id: '01048', name: 'Berlin-Tempelhof', state: 'Berlin', latestDate: '2024-12-31' },
+  { id: '01001', name: 'Bremen', state: 'Bremen', latestDate: '2024-12-31' },
+  { id: '01072', name: 'Dresden-Klotzsche', state: 'Sachsen', latestDate: '2024-12-31' },
+  { id: '01078', name: 'Düsseldorf', state: 'NRW', latestDate: '2024-12-31' },
+  { id: '01091', name: 'Essen', state: 'NRW', latestDate: '2024-12-31' },
+  { id: '01420', name: 'Frankfurt/Main', state: 'Hessen', latestDate: '2024-12-31' },
   { id: '01358', name: 'Hamburg-Fuhlsbüttel', state: 'Hamburg', latestDate: '2024-12-31' },
-  { id: '01050', name: 'München-Stadt', state: 'Bayern', latestDate: '2024-12-31' },
+  { id: '01103', name: 'Hannover', state: 'Niedersachsen', latestDate: '2024-12-31' },
+  { id: '01427', name: 'Karlsruhe-Rheinstetten', state: 'Baden-Württemberg', latestDate: '2024-12-31' },
   { id: '01270', name: 'Köln-Bonn', state: 'NRW', latestDate: '2024-12-31' },
-  { id: '01420', name: 'Frankfurt/Main', state: 'Hessen', latestDate: '2024-12-31' }
+  { id: '01161', name: 'Leipzig', state: 'Sachsen', latestDate: '2024-12-31' },
+  { id: '01050', name: 'München-Stadt', state: 'Bayern', latestDate: '2024-12-31' },
+  { id: '01207', name: 'Nürnberg', state: 'Bayern', latestDate: '2024-12-31' },
+  { id: '01346', name: 'Rostock-Warnemünde', state: 'Mecklenburg-Vorpommern', latestDate: '2024-12-31' },
+  { id: '01303', name: 'Saarbrücken-Ensheim', state: 'Saarland', latestDate: '2024-12-31' },
+  { id: '01297', name: 'Stuttgart-Echterdingen', state: 'Baden-Württemberg', latestDate: '2024-12-31' }
 ])
 </script>
 

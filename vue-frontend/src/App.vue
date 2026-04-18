@@ -11,10 +11,10 @@
             <div>
               <router-link to="/" class="group">
                 <h1 class="text-2xl font-bold text-gradient tracking-tight">
-                  Weather History <span class="text-primary-700">DWD</span>
+                  {{ $t('app.title') }} <span class="text-primary-700">DWD</span>
                 </h1>
                 <p class="text-sm text-gray-500 mt-1 group-hover:text-primary-600 transition-colors">
-                  Historische Wetterdaten deutscher Stationen
+                  {{ $t('app.subtitle') }}
                 </p>
               </router-link>
             </div>
@@ -27,7 +27,7 @@
               :class="{ 'nav-link-active': $route.path === '/' }"
             >
               <i class="pi pi-home mr-2 group-hover:scale-110 transition-transform"></i>
-              <span>Dashboard</span>
+              <span>{{ $t('navigation.dashboard') }}</span>
             </router-link>
             <router-link 
               to="/stations" 
@@ -35,7 +35,7 @@
               :class="{ 'nav-link-active': $route.path.startsWith('/stations') }"
             >
               <i class="pi pi-map-marker mr-2 group-hover:scale-110 transition-transform"></i>
-              <span>Stationen</span>
+              <span>{{ $t('navigation.stations') }}</span>
             </router-link>
             <router-link 
               to="/charts" 
@@ -43,7 +43,7 @@
               :class="{ 'nav-link-active': $route.path.startsWith('/charts') }"
             >
               <i class="pi pi-chart-line mr-2 group-hover:scale-110 transition-transform"></i>
-              <span>Diagramme</span>
+              <span>{{ $t('navigation.charts') }}</span>
             </router-link>
             <router-link 
               to="/maps" 
@@ -51,7 +51,7 @@
               :class="{ 'nav-link-active': $route.path.startsWith('/maps') }"
             >
               <i class="pi pi-map mr-2 group-hover:scale-110 transition-transform"></i>
-              <span>Karten</span>
+              <span>{{ $t('navigation.maps') }}</span>
             </router-link>
             <router-link 
               to="/export" 
@@ -59,7 +59,7 @@
               :class="{ 'nav-link-active': $route.path.startsWith('/export') }"
             >
               <i class="pi pi-download mr-2 group-hover:scale-110 transition-transform"></i>
-              <span>Export</span>
+              <span>{{ $t('navigation.export') }}</span>
             </router-link>
           </nav>
         </div>
@@ -82,38 +82,37 @@
               <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
                 <i class="pi pi-cloud text-white text-sm"></i>
               </div>
-              <h3 class="text-lg font-bold text-gray-800">Weather History DWD</h3>
+              <h3 class="text-lg font-bold text-gray-800">{{ $t('app.title') }}</h3>
             </div>
             <p class="text-gray-600 text-sm leading-relaxed">
-              Professionelle Visualisierung historischer Wetterdaten deutscher Stationen.
-              Datenquelle: Deutscher Wetterdienst (DWD) Open Data.
+              {{ $t('app.description') }}
             </p>
           </div>
           
           <div>
-            <h4 class="font-semibold text-gray-800 mb-4">Daten</h4>
+            <h4 class="font-semibold text-gray-800 mb-4">{{ $t('footer.data') }}</h4>
             <ul class="space-y-2">
               <li class="flex items-center text-sm text-gray-600">
                 <i class="pi pi-check-circle text-success-500 mr-2"></i>
-                <span>Tägliche Klimadaten (KL-Format)</span>
+                <span>{{ $t('footer.dailyClimateData') }}</span>
               </li>
               <li class="flex items-center text-sm text-gray-600">
                 <i class="pi pi-check-circle text-success-500 mr-2"></i>
-                <span>15 deutsche Stationen</span>
+                <span>{{ $t('footer.germanStations', [16]) }}</span>
               </li>
               <li class="flex items-center text-sm text-gray-600">
                 <i class="pi pi-check-circle text-success-500 mr-2"></i>
-                <span>Zeitraum 1990-2024</span>
+                <span>{{ $t('footer.timePeriod') }}</span>
               </li>
               <li class="flex items-center text-sm text-gray-600">
                 <i class="pi pi-check-circle text-success-500 mr-2"></i>
-                <span>+2.3M Datensätze</span>
+                <span>{{ $t('footer.datasets', ['2.3M']) }}</span>
               </li>
             </ul>
           </div>
           
           <div>
-            <h4 class="font-semibold text-gray-800 mb-4">Technologien</h4>
+            <h4 class="font-semibold text-gray-800 mb-4">{{ $t('footer.technologies') }}</h4>
             <div class="flex flex-wrap gap-2">
               <span class="badge-primary">Vue.js 3</span>
               <span class="badge-success">TypeScript</span>
@@ -125,24 +124,24 @@
           </div>
           
           <div>
-            <h4 class="font-semibold text-gray-800 mb-4">Links</h4>
+            <h4 class="font-semibold text-gray-800 mb-4">{{ $t('footer.links') }}</h4>
             <ul class="space-y-2">
               <li>
                 <a href="https://opendata.dwd.de/" target="_blank" class="flex items-center text-sm text-gray-600 hover:text-primary-600 transition-colors">
                   <i class="pi pi-external-link mr-2"></i>
-                  DWD Open Data Server
+                  {{ $t('footer.dwdOpenDataServer') }}
                 </a>
               </li>
               <li>
                 <a href="https://github.com/elmohuppi-stack/weather-history" target="_blank" class="flex items-center text-sm text-gray-600 hover:text-primary-600 transition-colors">
                   <i class="pi pi-github mr-2"></i>
-                  GitHub Repository
+                  {{ $t('footer.githubRepository') }}
                 </a>
               </li>
               <li>
                 <a href="http://localhost:8080" target="_blank" class="flex items-center text-sm text-gray-600 hover:text-primary-600 transition-colors">
                   <i class="pi pi-database mr-2"></i>
-                  Datenbank Admin
+                  {{ $t('footer.databaseAdmin') }}
                 </a>
               </li>
             </ul>
@@ -151,10 +150,10 @@
         
         <div class="border-t border-gray-200 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p class="text-gray-500 text-sm">
-            © 2024 Weather History DWD. Alle Daten vom Deutschen Wetterdienst (DWD) Open Data Server.
+            {{ $t('footer.copyright') }}
           </p>
           <div class="flex items-center space-x-4 mt-4 md:mt-0">
-            <span class="text-xs text-gray-400">Entwickelt mit</span>
+            <span class="text-xs text-gray-400">{{ $t('footer.developedWith') }}</span>
             <div class="flex space-x-2">
               <i class="pi pi-heart text-danger-500"></i>
               <i class="pi pi-code text-primary-500"></i>

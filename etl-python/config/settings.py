@@ -65,6 +65,7 @@ SELECTED_STATIONS = [
     '01297',  # Stuttgart-Echterdingen
     '01303',  # Saarbrücken-Ensheim
     '01346',  # Rostock-Warnemünde
+    '01427',  # Karlsruhe-Rheinstetten
 ]
 
 # Parameter-Mapping für DWD-Daten

@@ -44,7 +44,7 @@ class DWDImporter:
         self.daily_kl_url = f"{DWD_BASE_URL}/climate_environment/CDC/observations_germany/climate/daily/kl/historical/"
         self.recent_kl_url = f"{DWD_BASE_URL}/climate_environment/CDC/observations_germany/climate/daily/kl/recent/"
         
-        # Ausgewählte Stationen für MVP (15 wichtige Stationen)
+        # Ausgewählte Stationen für MVP (16 wichtige Stationen)
         self.selected_stations = [
             '01048',  # Berlin-Tempelhof
             '01358',  # Hamburg-Fuhlsbüttel
@@ -61,6 +61,7 @@ class DWDImporter:
             '01297',  # Stuttgart-Echterdingen
             '01303',  # Saarbrücken-Ensheim
             '01346',  # Rostock-Warnemünde
+            '01427',  # Karlsruhe-Rheinstetten
         ]
     
     def init_database(self):
@@ -106,6 +107,7 @@ class DWDImporter:
             '01050': {'name': 'München-Stadt', 'lat': 48.14, 'lon': 11.57, 'elevation': 515},
             '01270': {'name': 'Köln-Bonn', 'lat': 50.87, 'lon': 7.17, 'elevation': 91},
             '01420': {'name': 'Frankfurt/Main', 'lat': 50.05, 'lon': 8.60, 'elevation': 112},
+            '01427': {'name': 'Karlsruhe-Rheinstetten', 'lat': 48.98, 'lon': 8.33, 'elevation': 112},
         }
         
         station_info = stations_info.get(station_id, {

@@ -6,7 +6,7 @@
         Deutsche <span class="text-gradient">Wetterstationen</span>
       </h1>
       <p class="text-xl text-gray-600 max-w-3xl leading-relaxed">
-        Übersicht aller 15 Wetterstationen des Deutschen Wetterdienstes mit täglichen Klimadaten von 1990 bis 2024.
+        Übersicht aller 16 Wetterstationen des Deutschen Wetterdienstes mit täglichen Klimadaten von 1990 bis 2024.
       </p>
     </div>
 
@@ -181,56 +181,136 @@ import { ref, onMounted } from 'vue'
 const loading = ref(true)
 const error = ref<string | null>(null)
 
-const stations = ref([
-  {
-    id: 1,
-    name: 'Berlin-Tempelhof',
-    location: 'Berlin, Deutschland',
-    elevation: 48,
-    start_year: 1990,
-    measurement_count: 12450
-  },
-  {
-    id: 2,
-    name: 'Hamburg-Fuhlsbüttel',
-    location: 'Hamburg, Deutschland',
-    elevation: 16,
-    start_year: 1990,
-    measurement_count: 12450
-  },
-  {
-    id: 3,
-    name: 'München-Flughafen',
-    location: 'München, Deutschland',
-    elevation: 448,
-    start_year: 1990,
-    measurement_count: 12450
-  },
-  {
-    id: 4,
-    name: 'Köln-Bonn',
-    location: 'Köln, Deutschland',
-    elevation: 91,
-    start_year: 1990,
-    measurement_count: 12450
-  },
-  {
-    id: 5,
-    name: 'Frankfurt am Main',
-    location: 'Frankfurt, Deutschland',
-    elevation: 112,
-    start_year: 1990,
-    measurement_count: 12450
-  },
-  {
-    id: 6,
-    name: 'Stuttgart-Echterdingen',
-    location: 'Stuttgart, Deutschland',
-    elevation: 371,
-    start_year: 1990,
-    measurement_count: 12450
-  }
-])
+  const stations = ref([
+    {
+      id: 1,
+      name: 'Berlin-Tempelhof',
+      location: 'Berlin, Deutschland',
+      elevation: 48,
+      start_year: 1990,
+      measurement_count: 12450
+    },
+    {
+      id: 6,
+      name: 'Bremen',
+      location: 'Bremen, Deutschland',
+      elevation: 4,
+      start_year: 1990,
+      measurement_count: 12450
+    },
+    {
+      id: 7,
+      name: 'Dresden-Klotzsche',
+      location: 'Dresden, Deutschland',
+      elevation: 227,
+      start_year: 1990,
+      measurement_count: 12450
+    },
+    {
+      id: 8,
+      name: 'Düsseldorf',
+      location: 'Düsseldorf, Deutschland',
+      elevation: 44,
+      start_year: 1990,
+      measurement_count: 12450
+    },
+    {
+      id: 9,
+      name: 'Essen',
+      location: 'Essen, Deutschland',
+      elevation: 161,
+      start_year: 1990,
+      measurement_count: 12450
+    },
+    {
+      id: 5,
+      name: 'Frankfurt/Main',
+      location: 'Frankfurt, Deutschland',
+      elevation: 112,
+      start_year: 1990,
+      measurement_count: 12450
+    },
+    {
+      id: 2,
+      name: 'Hamburg-Fuhlsbüttel',
+      location: 'Hamburg, Deutschland',
+      elevation: 16,
+      start_year: 1990,
+      measurement_count: 12450
+    },
+    {
+      id: 10,
+      name: 'Hannover',
+      location: 'Hannover, Deutschland',
+      elevation: 55,
+      start_year: 1990,
+      measurement_count: 12450
+    },
+    {
+      id: 16,
+      name: 'Karlsruhe-Rheinstetten',
+      location: 'Karlsruhe, Deutschland',
+      elevation: 112,
+      start_year: 1990,
+      measurement_count: 12450
+    },
+    {
+      id: 4,
+      name: 'Köln-Bonn',
+      location: 'Köln, Deutschland',
+      elevation: 91,
+      start_year: 1990,
+      measurement_count: 12450
+    },
+    {
+      id: 11,
+      name: 'Leipzig',
+      location: 'Leipzig, Deutschland',
+      elevation: 132,
+      start_year: 1990,
+      measurement_count: 12450
+    },
+    {
+      id: 3,
+      name: 'München-Stadt',
+      location: 'München, Deutschland',
+      elevation: 448,
+      start_year: 1990,
+      measurement_count: 12450
+    },
+    {
+      id: 12,
+      name: 'Nürnberg',
+      location: 'Nürnberg, Deutschland',
+      elevation: 312,
+      start_year: 1990,
+      measurement_count: 12450
+    },
+    {
+      id: 15,
+      name: 'Rostock-Warnemünde',
+      location: 'Rostock, Deutschland',
+      elevation: 4,
+      start_year: 1990,
+      measurement_count: 12450
+    },
+    {
+      id: 14,
+      name: 'Saarbrücken-Ensheim',
+      location: 'Saarbrücken, Deutschland',
+      elevation: 322,
+      start_year: 1990,
+      measurement_count: 12450
+    },
+    {
+      id: 13,
+      name: 'Stuttgart-Echterdingen',
+      location: 'Stuttgart, Deutschland',
+      elevation: 371,
+      start_year: 1990,
+      measurement_count: 12450
+    }
+  ])
 
 onMounted(async () => {
   try {

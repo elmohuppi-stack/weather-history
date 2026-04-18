@@ -89,7 +89,7 @@ db-shell:
 # Service commands
 frontend:
 	@echo "🎨 Starting Vue.js frontend..."
-	cd vue-frontend && npm run dev
+	cd vue-frontend && npm run dev &
 
 backend:
 	@echo "⚙️  Starting Laravel backend..."
@@ -100,7 +100,7 @@ backend:
 	@echo "🗄️  Running migrations..."
 	cd laravel-backend && php artisan migrate
 	@echo "🚀 Starting development server..."
-	cd laravel-backend && php artisan serve
+	cd laravel-backend && php artisan serve &
 
 # Individual service control commands
 start-docker:
@@ -121,7 +121,7 @@ start-backend: backend
 
 stop-backend:
 	@echo "🛑 Stopping backend..."
-	@if pkill -f "php -S 127.0.0.1:8000"; then \
+	@if pkill -f "php artisan serve"; then \
 		echo "✅ Backend stopped"; \
 	else \
 		echo "ℹ️  Backend was not running"; \

@@ -1,115 +1,225 @@
 <template>
   <div class="charts-view">
-    <div class="container mx-auto px-4 py-8">
-      <h1 class="text-3xl font-bold mb-6 text-gray-800">Wetterdiagramme</h1>
-      
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Temperature Chart -->
-        <div class="bg-white rounded-lg shadow-lg p-6">
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-semibold text-gray-800">Temperaturverlauf</h2>
-            <div class="flex items-center space-x-2">
-              <i class="pi pi-thermometer text-red-500"></i>
-              <span class="text-sm text-gray-600">1990-2024</span>
-            </div>
+    <!-- Header -->
+    <div class="mb-12">
+      <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6 tracking-tight">
+        Wetter <span class="text-gradient">Diagramme</span>
+      </h1>
+      <p class="text-xl text-gray-600 max-w-3xl leading-relaxed">
+        Interaktive Visualisierung historischer Wetterdaten mit Chart.js. Analysieren Sie Temperatur, Niederschlag und Sonnenscheindauer.
+      </p>
+    </div>
+
+    <!-- Chart Controls -->
+    <div class="card mb-8">
+      <div class="card-header">
+        <h3 class="text-xl font-bold text-gray-900">Diagramm-Konfiguration</h3>
+        <p class="text-sm text-gray-500 mt-1">Passen Sie die Diagramme an Ihre Anforderungen an</p>
+      </div>
+      <div class="card-body">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Station</label>
+            <select class="select w-full">
+              <option>Alle Stationen</option>
+              <option>Berlin-Tempelhof</option>
+              <option>Hamburg-Fuhlsbüttel</option>
+              <option>München-Flughafen</option>
+              <option>Köln-Bonn</option>
+              <option>Frankfurt am Main</option>
+            </select>
           </div>
-          <div class="h-64 bg-gray-100 rounded flex items-center justify-center">
-            <div class="text-center">
-              <i class="pi pi-chart-line text-4xl text-gray-400 mb-4"></i>
-              <p class="text-gray-600">Temperaturdiagramm wird geladen</p>
-              <p class="text-gray-500 text-sm mt-2">(Chart.js Integration)</p>
-            </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Zeitraum</label>
+            <select class="select w-full">
+              <option>1990-2024 (Vollständig)</option>
+              <option>2000-2024</option>
+              <option>2010-2024</option>
+              <option>Letzte 10 Jahre</option>
+              <option>Benutzerdefiniert</option>
+            </select>
           </div>
-          <div class="mt-4 text-sm text-gray-600">
-            <p>Durchschnittliche Jahrestemperaturen für ausgewählte Stationen.</p>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Aggregation</label>
+            <select class="select w-full">
+              <option>Jährlich</option>
+              <option>Monatlich</option>
+              <option>Vierteljährlich</option>
+              <option>Täglich (ausgewählter Monat)</option>
+            </select>
+          </div>
+          <div class="flex items-end">
+            <button class="btn-primary w-full">
+              <i class="pi pi-refresh mr-2"></i>
+              Diagramme aktualisieren
+            </button>
           </div>
         </div>
-        
-        <!-- Precipitation Chart -->
-        <div class="bg-white rounded-lg shadow-lg p-6">
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-semibold text-gray-800">Niederschlagsmengen</h2>
+      </div>
+    </div>
+
+    <!-- Charts Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+      <!-- Temperature Chart -->
+      <div class="card hover-lift">
+        <div class="card-header">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xl font-bold text-gray-900">Temperaturverlauf</h3>
             <div class="flex items-center space-x-2">
-              <i class="pi pi-cloud-rain text-blue-500"></i>
-              <span class="text-sm text-gray-600">1990-2024</span>
+              <i class="pi pi-thermometer text-danger-500"></i>
+              <span class="text-sm font-medium text-gray-700">1990-2024</span>
             </div>
-          </div>
-          <div class="h-64 bg-gray-100 rounded flex items-center justify-center">
-            <div class="text-center">
-              <i class="pi pi-chart-bar text-4xl text-gray-400 mb-4"></i>
-              <p class="text-gray-600">Niederschlagsdiagramm wird geladen</p>
-              <p class="text-gray-500 text-sm mt-2">(Chart.js Integration)</p>
-            </div>
-          </div>
-          <div class="mt-4 text-sm text-gray-600">
-            <p>Jährliche Niederschlagsmengen in mm für deutsche Wetterstationen.</p>
           </div>
         </div>
-        
-        <!-- Sunshine Chart -->
-        <div class="bg-white rounded-lg shadow-lg p-6 lg:col-span-2">
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-semibold text-gray-800">Sonnenscheindauer</h2>
-            <div class="flex items-center space-x-2">
-              <i class="pi pi-sun text-yellow-500"></i>
-              <span class="text-sm text-gray-600">1990-2024</span>
+        <div class="card-body">
+          <div class="h-80 rounded-2xl bg-gradient-to-br from-red-50 to-red-100 border border-red-200 flex items-center justify-center">
+            <div class="text-center p-8">
+              <i class="pi pi-chart-line text-5xl text-red-400 mb-6"></i>
+              <h4 class="text-2xl font-bold text-gray-800 mb-2">Temperaturdiagramm</h4>
+              <p class="text-gray-600 mb-4">Durchschnittliche Jahrestemperaturen für ausgewählte Stationen</p>
+              <div class="inline-flex items-center px-4 py-2 bg-white rounded-xl border border-red-200">
+                <span class="text-sm text-gray-700">Chart.js Integration</span>
+                <i class="pi pi-arrow-up-right ml-2 text-red-500"></i>
+              </div>
             </div>
           </div>
-          <div class="h-80 bg-gray-100 rounded flex items-center justify-center">
-            <div class="text-center">
-              <i class="pi pi-chart-pie text-4xl text-gray-400 mb-4"></i>
-              <p class="text-gray-600">Sonnenscheindauer-Diagramm wird geladen</p>
-              <p class="text-gray-500 text-sm mt-2">(Chart.js Integration)</p>
+        </div>
+        <div class="card-footer">
+          <div class="flex justify-between items-center">
+            <div class="text-sm text-gray-600">
+              <p>Parameter: Mittlere Jahrestemperatur (°C)</p>
             </div>
-          </div>
-          <div class="mt-4 text-sm text-gray-600">
-            <p>Monatliche Sonnenscheindauer in Stunden für verschiedene Regionen Deutschlands.</p>
+            <button class="btn-secondary">
+              <i class="pi pi-download mr-2"></i>
+              Daten exportieren
+            </button>
           </div>
         </div>
       </div>
       
-      <!-- Filter Controls -->
-      <div class="mt-8 bg-gray-50 rounded-lg p-6">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">Diagramm-Einstellungen</h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Station auswählen</label>
-            <div class="relative">
-              <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <option>Alle Stationen</option>
-                <option>Berlin-Tempelhof</option>
-                <option>Hamburg-Fuhlsbüttel</option>
-                <option>München-Flughafen</option>
-              </select>
-            </div>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Zeitraum</label>
-            <div class="relative">
-              <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <option>1990-2024 (Vollständig)</option>
-                <option>2000-2024</option>
-                <option>2010-2024</option>
-                <option>Letzte 10 Jahre</option>
-              </select>
-            </div>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Aggregation</label>
-            <div class="relative">
-              <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <option>Jährlich</option>
-                <option>Monatlich</option>
-                <option>Täglich (ausgewählter Monat)</option>
-              </select>
+      <!-- Precipitation Chart -->
+      <div class="card hover-lift">
+        <div class="card-header">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xl font-bold text-gray-900">Niederschlagsmengen</h3>
+            <div class="flex items-center space-x-2">
+              <i class="pi pi-cloud-rain text-primary-500"></i>
+              <span class="text-sm font-medium text-gray-700">1990-2024</span>
             </div>
           </div>
         </div>
-        <div class="mt-6 flex justify-end">
-          <button class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            <i class="pi pi-refresh mr-2"></i>
-            Diagramme aktualisieren
-          </button>
+        <div class="card-body">
+          <div class="h-80 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 flex items-center justify-center">
+            <div class="text-center p-8">
+              <i class="pi pi-chart-bar text-5xl text-blue-400 mb-6"></i>
+              <h4 class="text-2xl font-bold text-gray-800 mb-2">Niederschlagsdiagramm</h4>
+              <p class="text-gray-600 mb-4">Jährliche Niederschlagsmengen in mm für deutsche Wetterstationen</p>
+              <div class="inline-flex items-center px-4 py-2 bg-white rounded-xl border border-blue-200">
+                <span class="text-sm text-gray-700">Chart.js Integration</span>
+                <i class="pi pi-arrow-up-right ml-2 text-blue-500"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="flex justify-between items-center">
+            <div class="text-sm text-gray-600">
+              <p>Parameter: Jahresniederschlagssumme (mm)</p>
+            </div>
+            <button class="btn-secondary">
+              <i class="pi pi-download mr-2"></i>
+              Daten exportieren
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Sunshine Chart -->
+      <div class="card hover-lift lg:col-span-2">
+        <div class="card-header">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xl font-bold text-gray-900">Sonnenscheindauer</h3>
+            <div class="flex items-center space-x-2">
+              <i class="pi pi-sun text-warning-500"></i>
+              <span class="text-sm font-medium text-gray-700">1990-2024</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="h-96 rounded-2xl bg-gradient-to-br from-yellow-50 to-yellow-100 border border-yellow-200 flex items-center justify-center">
+            <div class="text-center p-8 max-w-2xl">
+              <i class="pi pi-chart-pie text-5xl text-yellow-400 mb-6"></i>
+              <h4 class="text-2xl font-bold text-gray-800 mb-2">Sonnenscheindauer-Analyse</h4>
+              <p class="text-gray-600 mb-6">Monatliche Sonnenscheindauer in Stunden für verschiedene Regionen Deutschlands</p>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="text-center p-4 bg-white rounded-xl border border-yellow-200">
+                  <p class="text-sm text-gray-500">Norddeutschland</p>
+                  <p class="text-xl font-bold text-gray-900">1,650 h</p>
+                </div>
+                <div class="text-center p-4 bg-white rounded-xl border border-yellow-200">
+                  <p class="text-sm text-gray-500">Süddeutschland</p>
+                  <p class="text-xl font-bold text-gray-900">1,890 h</p>
+                </div>
+                <div class="text-center p-4 bg-white rounded-xl border border-yellow-200">
+                  <p class="text-sm text-gray-500">Ostdeutschland</p>
+                  <p class="text-xl font-bold text-gray-900">1,720 h</p>
+                </div>
+                <div class="text-center p-4 bg-white rounded-xl border border-yellow-200">
+                  <p class="text-sm text-gray-500">Westdeutschland</p>
+                  <p class="text-xl font-bold text-gray-900">1,780 h</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="flex justify-between items-center">
+            <div class="text-sm text-gray-600">
+              <p>Parameter: Monatliche Sonnenscheindauer (Stunden), Jahresmittelwerte</p>
+            </div>
+            <button class="btn-secondary">
+              <i class="pi pi-download mr-2"></i>
+              Daten exportieren
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Advanced Options -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="text-xl font-bold text-gray-900">Erweiterte Optionen</h3>
+        <p class="text-sm text-gray-500 mt-1">Weitere Analysemöglichkeiten und Exportformate</p>
+      </div>
+      <div class="card-body">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="text-center p-6 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200">
+            <i class="pi pi-table text-4xl text-gray-600 mb-4"></i>
+            <h4 class="font-bold text-gray-900 mb-2">Daten-Tabelle</h4>
+            <p class="text-gray-600 text-sm mb-4">Rohdaten in tabellarischer Form anzeigen</p>
+            <button class="btn-secondary w-full">
+              Tabelle öffnen
+            </button>
+          </div>
+          <div class="text-center p-6 rounded-2xl bg-gradient-to-br from-green-50 to-green-100 border border-green-200">
+            <i class="pi pi-file-excel text-4xl text-green-600 mb-4"></i>
+            <h4 class="font-bold text-gray-900 mb-2">Excel-Export</h4>
+            <p class="text-gray-600 text-sm mb-4">Diagrammdaten als Excel-Datei exportieren</p>
+            <button class="btn-success w-full">
+              <i class="pi pi-download mr-2"></i>
+              Excel herunterladen
+            </button>
+          </div>
+          <div class="text-center p-6 rounded-2xl bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200">
+            <i class="pi pi-image text-4xl text-purple-600 mb-4"></i>
+            <h4 class="font-bold text-gray-900 mb-2">Bild-Export</h4>
+            <p class="text-gray-600 text-sm mb-4">Diagramme als PNG oder SVG exportieren</p>
+            <button class="btn-primary w-full">
+              <i class="pi pi-image mr-2"></i>
+              Bild exportieren
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -123,6 +233,5 @@
 <style scoped>
 .charts-view {
   min-height: calc(100vh - 64px);
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
 </style>

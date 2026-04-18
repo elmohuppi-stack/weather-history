@@ -1,7 +1,7 @@
 # Weather History DWD - Makefile for local development
 # Usage: make [target]
 
-.PHONY: help start stop restart build clean logs db-shell frontend backend etl test dev prod-sim health install update
+.PHONY: help start stop restart build clean logs db-shell frontend backend etl test dev prod-sim health install update start-docker stop-docker start-backend stop-backend start-frontend stop-frontend
 
 # Default target
 help:
@@ -23,6 +23,14 @@ help:
 	@echo "  make etl          - Run Python ETL import (sample data)"
 	@echo "  make dev          - Quick start: start all services (docker + backend + frontend)"
 	@echo "  make prod-sim     - Production simulation (build and start all services)"
+	@echo ""
+	@echo "🎯 Individual Service Control:"
+	@echo "  make start-docker - Start only Docker services"
+	@echo "  make stop-docker  - Stop only Docker services"
+	@echo "  make start-backend - Start only backend server"
+	@echo "  make stop-backend  - Stop backend server"
+	@echo "  make start-frontend - Start only frontend server"
+	@echo "  make stop-frontend  - Stop frontend server"
 	@echo ""
 	@echo "🧪 Test Commands:"
 	@echo "  make test         - Run all tests"
@@ -97,6 +105,42 @@ backend:
 	cd laravel-backend && php artisan migrate
 	@echo "🚀 Starting development server..."
 	cd laravel-backend && php artisan serve
+
+# Individual service control commands
+start-docker:
+	@echo "🐳 Starting Docker services..."
+	cd docker/development && docker-compose up -d postgres redis adminer
+	@echo "✅ Docker services started:"
+	@echo "  • PostgreSQL: localhost:5432"
+	@echo "  • Redis:      localhost:6379"
+	@echo "  • Adminer:    http://localhost:8080"
+
+stop-docker:
+	@echo "🐳 Stopping Docker services..."
+	cd docker/development && docker-compose down
+	@echo "✅ Docker services stopped"
+
+start-backend: backend
+	@echo "✅ Backend started at http://localhost:8000"
+
+stop-backend:
+	@echo "🛑 Stopping backend..."
+	@if pkill -f "php -S 127.0.0.1:8000"; then \
+		echo "✅ Backend stopped"; \
+	else \
+		echo "ℹ️  Backend was not running"; \
+	fi
+
+start-frontend: frontend
+	@echo "✅ Frontend started at http://localhost:3000"
+
+stop-frontend:
+	@echo "🛑 Stopping frontend..."
+	@if pkill -f "npm run dev"; then \
+		echo "✅ Frontend stopped"; \
+	else \
+		echo "ℹ️  Frontend was not running"; \
+	fi
 
 etl:
 	@echo "🐍 Running Python ETL import..."

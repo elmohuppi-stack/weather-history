@@ -105,10 +105,10 @@
                   <p class="text-sm text-gray-500">{{ station.state }}</p>
                 </div>
               </div>
-              <div class="text-right">
-                <p class="text-sm text-gray-500">Daten bis</p>
-                <p class="font-semibold text-gray-900">{{ station.latestDate }}</p>
-              </div>
+                <div class="text-right">
+                  <p class="text-sm text-gray-500">Daten bis</p>
+                  <p class="font-semibold text-gray-900">{{ station.latest_date }}</p>
+                </div>
             </div>
           </div>
         </div>
@@ -216,14 +216,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-
-interface Station {
-  id: string
-  name: string
-  state: string
-  latestDate: string
-}
+import { ref, onMounted } from 'vue'
+import { apiService, type Station } from '@/services/api'
 
 interface Stats {
   stations: number
@@ -233,30 +227,41 @@ interface Stats {
 }
 
 const stats = ref<Stats>({
-  stations: 16,
+  stations: 0,
   years: 34,
-  measurements: '2.3M',
+  measurements: '0',
   parameters: 8
 })
 
-const recentStations = ref<Station[]>([
-  { id: '01048', name: 'Berlin-Tempelhof', state: 'Berlin', latestDate: '2024-12-31' },
-  { id: '01001', name: 'Bremen', state: 'Bremen', latestDate: '2024-12-31' },
-  { id: '01072', name: 'Dresden-Klotzsche', state: 'Sachsen', latestDate: '2024-12-31' },
-  { id: '01078', name: 'Düsseldorf', state: 'NRW', latestDate: '2024-12-31' },
-  { id: '01091', name: 'Essen', state: 'NRW', latestDate: '2024-12-31' },
-  { id: '01420', name: 'Frankfurt/Main', state: 'Hessen', latestDate: '2024-12-31' },
-  { id: '01358', name: 'Hamburg-Fuhlsbüttel', state: 'Hamburg', latestDate: '2024-12-31' },
-  { id: '01103', name: 'Hannover', state: 'Niedersachsen', latestDate: '2024-12-31' },
-  { id: '01427', name: 'Karlsruhe-Rheinstetten', state: 'Baden-Württemberg', latestDate: '2024-12-31' },
-  { id: '01270', name: 'Köln-Bonn', state: 'NRW', latestDate: '2024-12-31' },
-  { id: '01161', name: 'Leipzig', state: 'Sachsen', latestDate: '2024-12-31' },
-  { id: '01050', name: 'München-Stadt', state: 'Bayern', latestDate: '2024-12-31' },
-  { id: '01207', name: 'Nürnberg', state: 'Bayern', latestDate: '2024-12-31' },
-  { id: '01346', name: 'Rostock-Warnemünde', state: 'Mecklenburg-Vorpommern', latestDate: '2024-12-31' },
-  { id: '01303', name: 'Saarbrücken-Ensheim', state: 'Saarland', latestDate: '2024-12-31' },
-  { id: '01297', name: 'Stuttgart-Echterdingen', state: 'Baden-Württemberg', latestDate: '2024-12-31' }
-])
+const recentStations = ref<Station[]>([])
+const isLoading = ref(true)
+const error = ref<string | null>(null)
+
+onMounted(async () => {
+  try {
+    isLoading.value = true
+    error.value = null
+    
+    // Fetch stations from API
+    const response = await apiService.getStations()
+    
+    if (response.success) {
+      recentStations.value = response.data
+      stats.value.stations = response.meta?.total || response.data.length
+      
+      // Calculate total measurements (simplified - would need actual count from API)
+      const totalMeasurements = response.data.reduce((sum, station) => sum + station.measurement_count, 0)
+      stats.value.measurements = totalMeasurements.toLocaleString()
+    } else {
+      error.value = 'Failed to load station data'
+    }
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : 'Unknown error occurred'
+    console.error('Error loading stations:', err)
+  } finally {
+    isLoading.value = false
+  }
+})
 </script>
 
 <style scoped>

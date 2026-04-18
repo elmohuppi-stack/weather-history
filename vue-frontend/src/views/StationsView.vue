@@ -89,7 +89,7 @@
             </div>
             <div class="text-right">
               <p class="text-sm text-gray-500">Letztes Update</p>
-              <p class="text-lg font-bold text-gray-900">2024-12-31</p>
+              <p class="text-lg font-bold text-gray-900">{{ station.latest_date }}</p>
             </div>
           </div>
           
@@ -177,149 +177,26 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { apiService, type Station } from '@/services/api'
 
-const loading = ref(true)
+const stations = ref<Station[]>([])
+const loading = ref(false)
 const error = ref<string | null>(null)
-
-  const stations = ref([
-    {
-      id: 1,
-      name: 'Berlin-Tempelhof',
-      location: 'Berlin, Deutschland',
-      elevation: 48,
-      start_year: 1990,
-      measurement_count: 12450
-    },
-    {
-      id: 6,
-      name: 'Bremen',
-      location: 'Bremen, Deutschland',
-      elevation: 4,
-      start_year: 1990,
-      measurement_count: 12450
-    },
-    {
-      id: 7,
-      name: 'Dresden-Klotzsche',
-      location: 'Dresden, Deutschland',
-      elevation: 227,
-      start_year: 1990,
-      measurement_count: 12450
-    },
-    {
-      id: 8,
-      name: 'Düsseldorf',
-      location: 'Düsseldorf, Deutschland',
-      elevation: 44,
-      start_year: 1990,
-      measurement_count: 12450
-    },
-    {
-      id: 9,
-      name: 'Essen',
-      location: 'Essen, Deutschland',
-      elevation: 161,
-      start_year: 1990,
-      measurement_count: 12450
-    },
-    {
-      id: 5,
-      name: 'Frankfurt/Main',
-      location: 'Frankfurt, Deutschland',
-      elevation: 112,
-      start_year: 1990,
-      measurement_count: 12450
-    },
-    {
-      id: 2,
-      name: 'Hamburg-Fuhlsbüttel',
-      location: 'Hamburg, Deutschland',
-      elevation: 16,
-      start_year: 1990,
-      measurement_count: 12450
-    },
-    {
-      id: 10,
-      name: 'Hannover',
-      location: 'Hannover, Deutschland',
-      elevation: 55,
-      start_year: 1990,
-      measurement_count: 12450
-    },
-    {
-      id: 16,
-      name: 'Karlsruhe-Rheinstetten',
-      location: 'Karlsruhe, Deutschland',
-      elevation: 112,
-      start_year: 1990,
-      measurement_count: 12450
-    },
-    {
-      id: 4,
-      name: 'Köln-Bonn',
-      location: 'Köln, Deutschland',
-      elevation: 91,
-      start_year: 1990,
-      measurement_count: 12450
-    },
-    {
-      id: 11,
-      name: 'Leipzig',
-      location: 'Leipzig, Deutschland',
-      elevation: 132,
-      start_year: 1990,
-      measurement_count: 12450
-    },
-    {
-      id: 3,
-      name: 'München-Stadt',
-      location: 'München, Deutschland',
-      elevation: 448,
-      start_year: 1990,
-      measurement_count: 12450
-    },
-    {
-      id: 12,
-      name: 'Nürnberg',
-      location: 'Nürnberg, Deutschland',
-      elevation: 312,
-      start_year: 1990,
-      measurement_count: 12450
-    },
-    {
-      id: 15,
-      name: 'Rostock-Warnemünde',
-      location: 'Rostock, Deutschland',
-      elevation: 4,
-      start_year: 1990,
-      measurement_count: 12450
-    },
-    {
-      id: 14,
-      name: 'Saarbrücken-Ensheim',
-      location: 'Saarbrücken, Deutschland',
-      elevation: 322,
-      start_year: 1990,
-      measurement_count: 12450
-    },
-    {
-      id: 13,
-      name: 'Stuttgart-Echterdingen',
-      location: 'Stuttgart, Deutschland',
-      elevation: 371,
-      start_year: 1990,
-      measurement_count: 12450
-    }
-  ])
 
 onMounted(async () => {
   try {
     loading.value = true
-    // In Zukunft: await stationsStore.fetchStations()
-    // stations.value = stationsStore.stations
-    await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate API call
+    error.value = null
+    
+    const response = await apiService.getStations()
+    
+    if (response.success) {
+      stations.value = response.data
+    } else {
+      error.value = 'Stationsdaten konnten nicht geladen werden.'
+    }
   } catch (err) {
-    error.value = 'Stationsdaten konnten nicht geladen werden.'
+    error.value = err instanceof Error ? err.message : 'Unknown error occurred'
     console.error('Error loading stations:', err)
   } finally {
     loading.value = false

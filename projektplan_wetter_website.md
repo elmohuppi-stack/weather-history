@@ -492,6 +492,68 @@ Wenn Sie mit der Umsetzung starten möchten, kann ich im nächsten Schritt direk
 5. **Python-ETL-Pipeline** für DWD-Daten-Parsing und -Import vorbereiten
 6. **Hetzner-Deployment-Skripte** gemäß Ihrer Vorlage anpassen
 
+## 📊 Projektstatus: Was wurde bereits umgesetzt? (Stand: 18. April 2026)
+
+### ✅ Erledigt - Grundinfrastruktur
+
+**Phase 1: MVP-Entwicklung (Woche 1-4)**
+- [x] **Git-Repository eingerichtet**: Mit strukturierten Ordnern (laravel-backend/, vue-frontend/, etl-python/, docker/)
+- [x] **Docker-Compose für Entwicklung**: Laravel (PHP-FPM + Nginx), Vue.js (Node), PostgreSQL mit PostGIS, Redis
+- [x] **Python-Umgebung für ETL**: wetterdienst-Package, Pandas, SQLAlchemy für Datenimport (funktioniert mit `make etl`)
+- [x] **Laravel Setup**: Laravel 11 Installation mit PostgreSQL-Treiber und notwendigen Paketen
+- [x] **Vue.js Setup**: Vue 3 mit TypeScript, Vite, Pinia, Vue Router, Tailwind CSS
+- [x] **Makefile für Entwicklung**: Vollständige Steuerung aller Services (`make start`, `make stop`, `make etl`, etc.)
+
+**Phase 2: MVP-Ausbau (Woche 5-8)**
+- [x] **Datenimport**: 15 Stationen erfolgreich importiert (27.405 Messungen) via `make etl`
+- [ ] **API-Vervollständigung**: Filter, Aggregationen, Statistiken
+- [ ] **Frontend-Grundgerüst**: Vue.js mit TypeScript, Tailwind CSS
+- [ ] **Kartenintegration**: Leaflet mit Stationspunkten
+- [ ] **Basis-Diagramme**: Chart.js für Zeitreihenvisualisierung
+
+### 📋 Offen - Noch zu implementieren
+
+**Datenexploration & Parser-Entwicklung**
+- [ ] **DWD-Daten analysieren**: 2-3 Beispiel-ZIPs von historischen KL-Daten downloaden
+- [ ] **Metadaten-Struktur**: Stationsinformationen und Dateiformate verstehen
+- [ ] **Python-Parser entwickeln**: Für ZIP-Extraktion und CSV-Parsing der DWD-Daten
+- [ ] **Test-Datenimport**: 5 Beispiel-Stationen in lokale Datenbank importieren (über Python-Skript)
+
+**MVP-Basisarchitektur**
+- [ ] **Laravel-Backend-Grundgerüst**: API-Routen, Controller, Eloquent Models für Stations und Measurements
+- [ ] **Datenbank-Schema**: Migrationen für PostgreSQL mit PostGIS; optionale Vorbereitung für TimescaleDB
+- [ ] **Vue.js-Frontend-Grundgerüst**: Komponenten-Struktur, Router, Pinia Store für State Management
+- [ ] **API-Integration**: Axios-Client für Kommunikation mit Laravel Backend
+- [ ] **Docker-Config für Produktion**: Mit Resource-Limits für CX23 Server
+
+**Hetzner-Deployment-Vorbereitung**
+- [ ] **DNS-Einträge vorbereiten**:
+  - `A`-Record für `wetter-dwd.elmarhepp.de` → Hetzner-Server-IP
+  - `A`-Record für `wetter-dwd-api.elmarhepp.de` → Hetzner-Server-IP
+- [ ] **Deployment-Skripte**: Docker-Compose-Production mit Ports 3031/3032
+- [ ] **Nginx-Konfiguration**: Gemäß hetzner-multi-app-template.md für Laravel + Vue.js
+- [ ] **Monitoring-Setup**: Basis-Monitoring für RAM, CPU, Disk, Laravel Telescope
+- [ ] **Täglicher Update-Job**: Cronjob oder Laravel Scheduler auf Hetzner einrichten, damit neue DWD-Daten automatisch einmal täglich importiert werden
+
+**Phase 3: MVP-Optimierung (Woche 9-10)**
+- [ ] **Performance-Optimierung**: Datenbank-Indizes, Caching (Redis)
+- [ ] **Responsive Design**: Mobile/Desktop Optimierung
+- [ ] **Datenexport**: CSV/JSON Export-Funktionalität
+- [ ] **Testing**: Unit Tests für kritische Komponenten
+
+**Phase 4: MVP-Deployment (Woche 11-12)**
+- [ ] **Docker-Compose-Produktion**: Resource Limits für CX23
+- [ ] **Hetzner-Deployment**: Nginx-Konfiguration, Certbot-Setup
+- [ ] **Monitoring**: Basis-Monitoring (RAM, CPU, Disk)
+- [ ] **Dokumentation**: Setup- und Bedienungsanleitung
+
+### 🎯 Nächste konkrete Schritte (Priorität)
+
+1. **Laravel-Backend-API entwickeln**: Grundlegende API-Endpunkte für Stationen und Messungen
+2. **Vue.js-Frontend implementieren**: Basis-Komponenten für Stationsauswahl und Datenvisualisierung
+3. **Datenbank-Schema finalisieren**: Migrationen für PostgreSQL mit PostGIS
+4. **Hetzner-Deployment vorbereiten**: DNS, Nginx-Konfiguration, Deployment-Skripte
+
 ---
 
 _Letzte Aktualisierung: 18. April 2026_  

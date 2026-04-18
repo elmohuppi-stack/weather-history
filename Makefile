@@ -9,9 +9,9 @@ help:
 	@echo "=============================================="
 	@echo ""
 	@echo "📦 Docker Commands:"
-	@echo "  make start        - Start all Docker services (postgres, redis, adminer)"
-	@echo "  make stop         - Stop all Docker services"
-	@echo "  make restart      - Restart all Docker services"
+	@echo "  make start        - Start ALL services (docker + backend + frontend)"
+	@echo "  make stop         - Stop ALL services (docker + backend + frontend)"
+	@echo "  make restart      - Restart all services"
 	@echo "  make build        - Build Docker images"
 	@echo "  make clean        - Stop services and remove volumes"
 	@echo "  make logs         - Show Docker logs (follow)"
@@ -56,20 +56,16 @@ help:
 	@echo ""
 
 # Docker commands
-start:
-	@echo "🚀 Starting Docker services..."
-	cd docker/development && docker-compose up -d postgres redis adminer
-	@echo "✅ Services started:"
-	@echo "  • PostgreSQL: localhost:5432"
-	@echo "  • Redis:      localhost:6379"
-	@echo "  • Adminer:    http://localhost:8080"
-	@echo ""
-	@echo "ℹ️  Run 'make backend' to start Laravel"
-	@echo "ℹ️  Run 'make frontend' to start Vue.js"
+start: start-docker start-backend start-frontend
+	@echo "🚀 All services started!"
+	@echo "🌐 Frontend: http://localhost:3000"
+	@echo "🌐 Backend:  http://localhost:8000"
+	@echo "🌐 Adminer:  http://localhost:8080"
+	@echo "🐘 PostgreSQL: localhost:5432"
+	@echo "🔴 Redis:    localhost:6379"
 
-stop:
-	@echo "🛑 Stopping Docker services..."
-	cd docker/development && docker-compose down
+stop: stop-docker stop-backend stop-frontend
+	@echo "🛑 All services stopped!"
 
 restart: stop start
 
@@ -207,7 +203,7 @@ db-restore:
 	fi
 
 # Quick start for development
-dev: start backend frontend
+dev: start
 	@echo "🚀 Development environment started!"
 	@echo "🌐 Frontend: http://localhost:3000"
 	@echo "🌐 Backend:  http://localhost:8000"

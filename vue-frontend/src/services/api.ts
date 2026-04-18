@@ -110,41 +110,100 @@ class ApiService {
     return response.data
   }
 
-  // Statistics API
-  async getStationStatistics(): Promise<ApiResponse<{
-    total_stations: number
-    active_stations: number
-    total_measurements: number
-    average_measurements_per_station: number
-  }>> {
-    const response: AxiosResponse<ApiResponse<any>> = await this.client.get('/v1/statistics/stations')
+  // Statistics API - Updated for new endpoints
+  async getOverallStatistics(): Promise<ApiResponse<any>> {
+    const response: AxiosResponse<ApiResponse<any>> = await this.client.get('/v1/statistics/overall')
     return response.data
   }
 
-  async getMeasurementStatistics(): Promise<ApiResponse<{
-    total_measurements: number
-    measurements_by_year: Record<string, number>
-    measurements_by_parameter: Record<string, number>
-  }>> {
-    const response: AxiosResponse<ApiResponse<any>> = await this.client.get('/v1/statistics/measurements')
+  async getStationStatistics(stationId: string): Promise<ApiResponse<any>> {
+    const response: AxiosResponse<ApiResponse<any>> = await this.client.get(`/v1/statistics/station/${stationId}`)
     return response.data
   }
 
-  // Map API
-  async getMapStations(): Promise<ApiResponse<Station[]>> {
-    const response: AxiosResponse<ApiResponse<Station[]>> = await this.client.get('/v1/maps/stations')
+  async getClimateNormals(params?: {
+    period?: string
+    station_ids?: string[]
+  }): Promise<ApiResponse<any>> {
+    const response: AxiosResponse<ApiResponse<any>> = await this.client.get('/v1/statistics/climate-normals', { params })
     return response.data
   }
 
-  // Export API
+  async getTrends(params: {
+    parameter: string
+    station_id?: string
+    start_year?: number
+    end_year?: number
+  }): Promise<ApiResponse<any>> {
+    const response: AxiosResponse<ApiResponse<any>> = await this.client.get('/v1/statistics/trends', { params })
+    return response.data
+  }
+
+  // Measurements API - Additional methods
+  async getLatestMeasurements(): Promise<ApiResponse<any>> {
+    const response: AxiosResponse<ApiResponse<any>> = await this.client.get('/v1/measurements/latest')
+    return response.data
+  }
+
+  // Map API - Updated for new endpoints
+  async getMapStations(): Promise<ApiResponse<any>> {
+    const response: AxiosResponse<ApiResponse<any>> = await this.client.get('/v1/maps/stations')
+    return response.data
+  }
+
+  async getStationsWithinBounds(params: {
+    north: number
+    south: number
+    east: number
+    west: number
+  }): Promise<ApiResponse<any>> {
+    const response: AxiosResponse<ApiResponse<any>> = await this.client.get('/v1/maps/within-bounds', { params })
+    return response.data
+  }
+
+  async getHeatmapData(params: {
+    parameter: string
+    year?: number
+    month?: number
+  }): Promise<ApiResponse<any>> {
+    const response: AxiosResponse<ApiResponse<any>> = await this.client.get('/v1/maps/heatmap', { params })
+    return response.data
+  }
+
+  async getClusterData(params: {
+    zoom: number
+  }): Promise<ApiResponse<any>> {
+    const response: AxiosResponse<ApiResponse<any>> = await this.client.get('/v1/maps/clusters', { params })
+    return response.data
+  }
+
+  // Export API - Updated for new endpoints
   async createExport(params: {
-    station_ids: string[]
+    format: 'csv' | 'json' | 'excel' | 'sql'
+    data_type: 'stations' | 'measurements' | 'statistics'
+    station_ids?: string[]
     start_date?: string
     end_date?: string
-    format: 'csv' | 'json' | 'excel'
     parameters?: string[]
-  }): Promise<ApiResponse<{ export_id: string; download_url: string }>> {
-    const response: AxiosResponse<ApiResponse<{ export_id: string; download_url: string }>> = await this.client.post('/v1/exports', params)
+  }): Promise<ApiResponse<any>> {
+    const response: AxiosResponse<ApiResponse<any>> = await this.client.post('/v1/exports', params)
+    return response.data
+  }
+
+  async getExportStatus(exportId: string): Promise<ApiResponse<any>> {
+    const response: AxiosResponse<ApiResponse<any>> = await this.client.get(`/v1/exports/${exportId}/status`)
+    return response.data
+  }
+
+  async downloadExport(exportId: string, params?: {
+    format?: string
+  }): Promise<ApiResponse<any>> {
+    const response: AxiosResponse<ApiResponse<any>> = await this.client.get(`/v1/exports/${exportId}/download`, { params })
+    return response.data
+  }
+
+  async getExportFormats(): Promise<ApiResponse<any>> {
+    const response: AxiosResponse<ApiResponse<any>> = await this.client.get('/v1/exports/formats')
     return response.data
   }
 }

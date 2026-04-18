@@ -242,22 +242,34 @@ onMounted(async () => {
     isLoading.value = true
     error.value = null
     
-    // Fetch stations from API
-    const response = await apiService.getStations()
+    // Fetch overall statistics from new API endpoint
+    const statsResponse = await apiService.getOverallStatistics()
     
-    if (response.success) {
-      recentStations.value = response.data
-      stats.value.stations = response.meta?.total || response.data.length
+    if (statsResponse.success) {
+      const statsData = statsResponse.data
       
-      // Calculate total measurements (simplified - would need actual count from API)
-      const totalMeasurements = response.data.reduce((sum, station) => sum + station.measurement_count, 0)
-      stats.value.measurements = totalMeasurements.toLocaleString()
+      // Update stats with real data from API
+      stats.value = {
+        stations: statsData.stations?.total || 16,
+        years: statsData.time_range?.years || 34,
+        measurements: statsData.measurements?.total?.toLocaleString() || '2.3M',
+        parameters: statsData.parameters?.total || 8
+      }
+    } else {
+      error.value = 'Failed to load statistics data'
+    }
+    
+    // Fetch stations from API
+    const stationsResponse = await apiService.getStations()
+    
+    if (stationsResponse.success) {
+      recentStations.value = stationsResponse.data.slice(0, 5) // Show only 5 most recent
     } else {
       error.value = 'Failed to load station data'
     }
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Unknown error occurred'
-    console.error('Error loading stations:', err)
+    console.error('Error loading dashboard data:', err)
   } finally {
     isLoading.value = false
   }

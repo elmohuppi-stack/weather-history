@@ -1,0 +1,209 @@
+# Weather History DWD - Makefile for local development
+# Usage: make [target]
+
+.PHONY: help start stop restart build clean logs db-shell frontend backend etl test
+
+# Default target
+help:
+	@echo "🌤️ Weather History DWD - Development Commands"
+	@echo "=============================================="
+	@echo ""
+	@echo "📦 Docker Commands:"
+	@echo "  make start        - Start all Docker services (postgres, redis, adminer)"
+	@echo "  make stop         - Stop all Docker services"
+	@echo "  make restart      - Restart all Docker services"
+	@echo "  make build        - Build Docker images"
+	@echo "  make clean        - Stop services and remove volumes"
+	@echo "  make logs         - Show Docker logs (follow)"
+	@echo "  make db-shell     - Open PostgreSQL shell"
+	@echo ""
+	@echo "🔧 Service Commands:"
+	@echo "  make frontend     - Start Vue.js frontend development server"
+	@echo "  make backend      - Start Laravel backend development server"
+	@echo "  make etl          - Run Python ETL import (sample data)"
+	@echo ""
+	@echo "🧪 Test Commands:"
+	@echo "  make test         - Run all tests"
+	@echo "  make test-frontend - Run Vue.js tests"
+	@echo "  make test-backend  - Run Laravel tests"
+	@echo ""
+	@echo "📊 Database Commands:"
+	@echo "  make db-init      - Initialize database schema"
+	@echo "  make db-reset     - Reset database (drop & recreate)"
+	@echo "  make db-backup    - Create database backup"
+	@echo "  make db-restore   - Restore database from backup"
+	@echo ""
+	@echo "🌐 URLs:"
+	@echo "  Frontend:    http://localhost:3000"
+	@echo "  Backend API: http://localhost:8000"
+	@echo "  Adminer:     http://localhost:8080"
+	@echo "  PostgreSQL:  localhost:5432"
+	@echo ""
+
+# Docker commands
+start:
+	@echo "🚀 Starting Docker services..."
+	cd docker/development && docker-compose up -d postgres redis adminer
+	@echo "✅ Services started:"
+	@echo "  • PostgreSQL: localhost:5432"
+	@echo "  • Redis:      localhost:6379"
+	@echo "  • Adminer:    http://localhost:8080"
+	@echo ""
+	@echo "ℹ️  Run 'make backend' to start Laravel"
+	@echo "ℹ️  Run 'make frontend' to start Vue.js"
+
+stop:
+	@echo "🛑 Stopping Docker services..."
+	cd docker/development && docker-compose down
+
+restart: stop start
+
+build:
+	@echo "🔨 Building Docker images..."
+	cd docker/development && docker-compose build
+
+clean:
+	@echo "🧹 Cleaning up Docker resources..."
+	cd docker/development && docker-compose down -v
+	@echo "✅ All containers and volumes removed"
+
+logs:
+	@echo "📋 Showing Docker logs (Ctrl+C to exit)..."
+	cd docker/development && docker-compose logs -f
+
+db-shell:
+	@echo "🐘 Opening PostgreSQL shell..."
+	cd docker/development && docker-compose exec postgres psql -U weather_user -d weather_history
+
+# Service commands
+frontend:
+	@echo "🎨 Starting Vue.js frontend..."
+	cd vue-frontend && npm run dev
+
+backend:
+	@echo "⚙️  Starting Laravel backend..."
+	@echo "📦 Installing dependencies..."
+	cd laravel-backend && composer install
+	@echo "🔑 Generating application key..."
+	cd laravel-backend && php artisan key:generate
+	@echo "🗄️  Running migrations..."
+	cd laravel-backend && php artisan migrate
+	@echo "🚀 Starting development server..."
+	cd laravel-backend && php artisan serve
+
+etl:
+	@echo "🐍 Running Python ETL import..."
+	@echo "📦 Installing Python dependencies..."
+	cd etl-python && pip install -r requirements.txt
+	@echo "📊 Importing sample data..."
+	cd etl-python && python scripts/dwd_importer.py --init-db --import-all
+	@echo "✅ ETL import completed"
+
+# Test commands
+test: test-backend test-frontend
+
+test-frontend:
+	@echo "🧪 Running Vue.js tests..."
+	cd vue-frontend && npm test
+
+test-backend:
+	@echo "🧪 Running Laravel tests..."
+	cd laravel-backend && php artisan test
+
+# Database commands
+db-init:
+	@echo "🗄️  Initializing database schema..."
+	cd docker/development && docker-compose exec -T postgres psql -U weather_user -d weather_history -f /docker-entrypoint-initdb.d/01-init-schema.sql
+	@echo "✅ Database schema initialized"
+
+db-reset:
+	@echo "🔄 Resetting database..."
+	@read -p "Are you sure? This will delete all data! (y/N): " confirm; \
+	if [ "$$confirm" = "y" ] || [ "$$confirm" = "Y" ]; then \
+		echo "Dropping and recreating database..."; \
+		cd docker/development && docker-compose down -v; \
+		docker-compose up -d postgres; \
+		sleep 10; \
+		docker-compose exec -T postgres psql -U weather_user -d weather_history -f /docker-entrypoint-initdb.d/01-init-schema.sql; \
+		echo "✅ Database reset complete"; \
+	else \
+		echo "❌ Database reset cancelled"; \
+	fi
+
+db-backup:
+	@echo "💾 Creating database backup..."
+	@mkdir -p backups
+	cd docker/development && docker-compose exec -T postgres pg_dump -U weather_user -d weather_history > ../backups/weather_history_$(shell date +%Y%m%d_%H%M%S).sql
+	@echo "✅ Backup saved to backups/"
+
+db-restore:
+	@echo "🔄 Restoring database from backup..."
+	@if [ -z "$(file)" ]; then \
+		echo "Usage: make db-restore file=backups/filename.sql"; \
+		exit 1; \
+	fi
+	@if [ ! -f "$(file)" ]; then \
+		echo "❌ File $(file) not found"; \
+		exit 1; \
+	fi
+	@read -p "Are you sure? This will overwrite current data! (y/N): " confirm; \
+	if [ "$$confirm" = "y" ] || [ "$$confirm" = "Y" ]; then \
+		echo "Restoring from $(file)..."; \
+		cd docker/development && docker-compose exec -T postgres psql -U weather_user -d weather_history < ../../$(file); \
+		echo "✅ Database restored from $(file)"; \
+	else \
+		echo "❌ Database restore cancelled"; \
+	fi
+
+# Quick start for development
+dev: start backend frontend
+	@echo "🚀 Development environment started!"
+	@echo "🌐 Frontend: http://localhost:3000"
+	@echo "🌐 Backend:  http://localhost:8000"
+	@echo "🌐 Adminer:  http://localhost:8080"
+
+# Production simulation
+prod-sim:
+	@echo "🏭 Starting production simulation..."
+	@echo "📦 Building all services..."
+	make build
+	@echo "🚀 Starting all services..."
+	cd docker/development && docker-compose up -d
+	@echo "✅ Production simulation started"
+	@echo "🌐 Frontend: http://localhost:3000"
+	@echo "🌐 Backend:  http://localhost:8000"
+	@echo "🌐 Adminer:  http://localhost:8080"
+
+# Health check
+health:
+	@echo "🏥 Checking service health..."
+	@echo "📊 Docker containers:"
+	cd docker/development && docker-compose ps
+	@echo ""
+	@echo "🔗 Checking connections..."
+	@echo "• PostgreSQL: $$(cd docker/development && docker-compose exec -T postgres pg_isready -U weather_user -d weather_history && echo "✅" || echo "❌")"
+	@echo "• Redis: $$(cd docker/development && docker-compose exec redis redis-cli ping 2>/dev/null | grep -q PONG && echo "✅" || echo "❌")"
+	@echo "• Frontend: $$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000 2>/dev/null | grep -q 200 && echo "✅" || echo "❌")"
+	@echo "• Backend: $$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000 2>/dev/null | grep -q 200 && echo "✅" || echo "❌")"
+
+# Install dependencies
+install:
+	@echo "📦 Installing all dependencies..."
+	@echo "🐘 Backend (PHP)..."
+	cd laravel-backend && composer install
+	@echo "🎨 Frontend (Node.js)..."
+	cd vue-frontend && npm install
+	@echo "🐍 ETL (Python)..."
+	cd etl-python && pip install -r requirements.txt
+	@echo "✅ All dependencies installed"
+
+# Update dependencies
+update:
+	@echo "🔄 Updating all dependencies..."
+	@echo "🐘 Backend (PHP)..."
+	cd laravel-backend && composer update
+	@echo "🎨 Frontend (Node.js)..."
+	cd vue-frontend && npm update
+	@echo "🐍 ETL (Python)..."
+	cd etl-python && pip install --upgrade -r requirements.txt
+	@echo "✅ All dependencies updated"

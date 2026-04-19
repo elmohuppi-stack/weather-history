@@ -384,6 +384,15 @@ class StatisticsController extends Controller
             }
         }
 
+        // Need at least 2 data points for trend analysis
+        if (count($values) < 2) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Insufficient data for trend analysis (need at least 2 years)',
+                'meta' => ['station_id' => $stationId, 'data_points' => count($values)],
+            ], 422);
+        }
+
         // Calculate trend line (simple linear regression)
         $n = count($values);
         $xSum = array_sum(array_keys($values));
@@ -397,7 +406,17 @@ class StatisticsController extends Controller
             $x2Sum += $x * $x;
         }
 
-        $slope = ($n * $xySum - $xSum * $ySum) / ($n * $x2Sum - $xSum * $xSum);
+        // Avoid division by zero
+        $denominator = ($n * $x2Sum - $xSum * $xSum);
+        if ($denominator == 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot calculate trend: insufficient variation in data',
+                'meta' => ['station_id' => $stationId],
+            ], 422);
+        }
+
+        $slope = ($n * $xySum - $xSum * $ySum) / $denominator;
         $intercept = ($ySum - $slope * $xSum) / $n;
         $ratePerDecade = $slope * 10; // Convert annual to decadal
 

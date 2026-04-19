@@ -81,7 +81,7 @@ class WeatherDataSeeder extends Seeder
             // Realistic weather patterns based on month
             $month = $date->month;
             $dayOfYear = $date->dayOfYear;
-            
+
             // Temperature variations by season
             $baseTemp = 8 + 15 * sin(2 * M_PI * ($dayOfYear - 80) / 365); // Seasonal curve
             $tempNoise = (rand(-50, 50) / 100); // ±0.5°C random
@@ -103,7 +103,7 @@ class WeatherDataSeeder extends Seeder
         for ($date = $startDate->copy(); $date <= $endDate; $date->addDay()) {
             $month = $date->month;
             $dayOfYear = $date->dayOfYear;
-            
+
             // Munich is cooler and has more snow in winter
             $baseTemp = 7 + 16 * sin(2 * M_PI * ($dayOfYear - 80) / 365) - 1.5; // Slightly cooler
             $tempNoise = (rand(-50, 50) / 100);
@@ -125,7 +125,7 @@ class WeatherDataSeeder extends Seeder
         for ($date = $startDate->copy(); $date <= $endDate; $date->addDay()) {
             $month = $date->month;
             $dayOfYear = $date->dayOfYear;
-            
+
             // Borkum is coastal, milder, windier
             $baseTemp = 9 + 14 * sin(2 * M_PI * ($dayOfYear - 80) / 365) - 0.5; // Milder
             $tempNoise = (rand(-50, 50) / 100);

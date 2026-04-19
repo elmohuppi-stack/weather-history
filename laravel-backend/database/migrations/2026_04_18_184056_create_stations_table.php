@@ -26,7 +26,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('dwd_url')->nullable();
             $table->timestamps();
-            
+
             // Add indexes for performance
             $table->index('lat');
             $table->index('lon');

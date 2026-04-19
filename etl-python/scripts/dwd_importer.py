@@ -27,7 +27,7 @@ import click
 # Add parent directory to path for imports
 sys.path.append(str(Path(__file__).parent.parent))
 
-from models.database import Base, Station, DailyMeasurement
+from models.database import Base, Station, DailyMeasurement, ImportLog
 from config.settings import DATABASE_URL, DWD_BASE_URL, PARAMETER_MAPPING, DOWNLOAD_TIMEOUT, CONNECT_TIMEOUT, CACHE_DIR
 
 # Configure logging
@@ -552,11 +552,18 @@ class DWDImporter:
         Returns:
             True bei Erfolg, False bei Fehler
         """
+        start_time = time.time()
+        session = None
+        success = False
+        records_processed = 0
+        error_message = None
+        
         try:
             session = self.Session()
             
             # Prüfe ob Station bereits existiert
             existing_station = session.query(Station).filter_by(id=station_id).first()
+            station_created = False
             
             if not existing_station:
                 # Lade Stationsdaten
@@ -564,6 +571,7 @@ class DWDImporter:
                 
                 if data is None or data.empty:
                     logger.warning(f"Keine Daten für Station {station_id} gefunden")
+                    error_message = f"Keine Daten für Station {station_id} gefunden"
                     return False
                 
                 # Extrahiere Stationsinformationen
@@ -587,24 +595,51 @@ class DWDImporter:
                 
                 session.add(station)
                 session.commit()
+                station_created = True
                 logger.info(f"Station {station_id} ({station.name}) hinzugefügt")
             
             # Importiere Messdaten
-            self._import_measurements(station_id, session)
+            records_processed = self._import_measurements(station_id, session)
             
-            session.close()
+            success = True
             return True
             
         except Exception as e:
             logger.error(f"Fehler beim Import von Station {station_id}: {e}")
+            error_message = str(e)
             return False
+            
+        finally:
+            # Schreibe Import-Log
+            if session:
+                try:
+                    duration_seconds = time.time() - start_time
+                    operation = 'create' if station_created else 'update'
+                    
+                    self._log_import_operation(
+                        session=session,
+                        station_id=station_id,
+                        operation=operation,
+                        records_processed=records_processed,
+                        success=success,
+                        error_message=error_message,
+                        duration_seconds=duration_seconds
+                    )
+                    
+                    session.close()
+                except Exception as log_error:
+                    logger.error(f"Fehler beim Schreiben des Import-Logs: {log_error}")
     
     def _import_measurements(self, station_id: str, session):
-        """Importiert Messdaten für eine Station, vermeidet Duplikate"""
+        """Importiert Messdaten für eine Station, vermeidet Duplikate
+        
+        Returns:
+            Anzahl der importierten Datensätze
+        """
         data = self.download_station_data(station_id)
         
         if data is None or data.empty:
-            return
+            return 0
         
         logger.info(f"Importiere {len(data)} Messungen für Station {station_id}...")
         
@@ -638,13 +673,14 @@ class DWDImporter:
         
         if not new_measurements:
             logger.info(f"Keine neuen Messungen für Station {station_id} (alle {len(data)} bereits vorhanden)")
-            return
+            return 0
         
         # Batch-Insert
         session.bulk_save_objects(new_measurements)
         session.commit()
         
         logger.success(f"{len(new_measurements)} neue Messungen für Station {station_id} importiert (übersprungen: {len(data) - len(new_measurements)})")
+        return len(new_measurements)
     
     def _get_state_from_coords(self, lat: float, lon: float) -> str:
         """Ermittelt Bundesland aus Koordinaten (vereinfacht)"""
@@ -681,6 +717,43 @@ class DWDImporter:
             return 'Hamburg'
         else:
             return 'Deutschland'
+    
+    def _log_import_operation(self, session, station_id: str, operation: str, 
+                             records_processed: int, success: bool = True, 
+                             error_message: str = None, duration_seconds: float = None):
+        """
+        Schreibt einen Import-Log-Eintrag in die Datenbank
+        
+        Args:
+            session: SQLAlchemy Session
+            station_id: DWD Stations-ID
+            operation: Art der Operation ('create', 'update', 'delete', 'full_import')
+            records_processed: Anzahl verarbeiteter Datensätze
+            success: Ob der Import erfolgreich war
+            error_message: Fehlermeldung bei Misserfolg
+            duration_seconds: Dauer des Imports in Sekunden
+        """
+        try:
+            import_log = ImportLog(
+                station_id=station_id,
+                operation=operation,
+                records_processed=records_processed,
+                success=success,
+                error_message=error_message,
+                duration_seconds=duration_seconds
+            )
+            
+            session.add(import_log)
+            session.commit()
+            logger.debug(f"Import-Log geschrieben: {operation} für Station {station_id}, {records_processed} Datensätze")
+            
+        except Exception as e:
+            logger.error(f"Fehler beim Schreiben des Import-Logs: {e}")
+            # Versuche Session zurückzusetzen
+            try:
+                session.rollback()
+            except:
+                pass
     
     def import_all_selected(self):
         """Importiert alle ausgewählten Stationen"""

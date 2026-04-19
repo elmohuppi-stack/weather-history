@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # PostgreSQL mit PostGIS
   postgres:
@@ -42,8 +40,8 @@ services:
   # Laravel Backend (PHP + Nginx)
   laravel-backend:
     build:
-      context: ../../laravel-backend
-      dockerfile: ../docker/development/Dockerfile.laravel
+      context: ../.. # Root directory of the project
+      dockerfile: docker/development/Dockerfile.laravel
     container_name: weather-laravel-dev
     depends_on:
       postgres:
@@ -72,8 +70,8 @@ services:
   # Vue.js Frontend (Node + Nginx)
   vue-frontend:
     build:
-      context: ../../vue-frontend
-      dockerfile: ../docker/development/Dockerfile.vue
+      context: ../.. # Root directory of the project
+      dockerfile: docker/development/Dockerfile.vue
     container_name: weather-vue-dev
     depends_on:
       - laravel-backend

@@ -5,8 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc && vite build",
-    "preview": "vite preview"
+    "typecheck": "vue-tsc --noEmit",
+    "build": "npm run typecheck && vite build",
+    "preview": "vite preview",
+    "postinstall": "node patch-primevue.js"
   },
   "dependencies": {
     "axios": "^1.6.0",
@@ -14,13 +16,14 @@
     "leaflet": "^1.9.0",
     "pinia": "^2.1.0",
     "primeicons": "^7.0.0",
-    "primevue": "^3.49.0",
+    "primevue": "^3.47.2",
     "vue": "^3.4.0",
     "vue-chartjs": "^5.3.0",
     "vue-i18n": "^11.3.2",
     "vue-router": "^4.3.0"
   },
   "devDependencies": {
+    "@types/node": "^25.6.0",
     "@vitejs/plugin-vue": "^5.0.0",
     "@vue/tsconfig": "^0.5.0",
     "autoprefixer": "^10.4.0",

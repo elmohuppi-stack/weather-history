@@ -374,7 +374,12 @@ const viewStationDetails = () => {
   }
 }
 
-const viewStationMeasurements = (station?: Station) => {
+const viewStationMeasurements = (stationOrEvent?: Station | Event) => {
+  // Handle both cases: station parameter or event parameter
+  let station: Station | undefined
+  if (stationOrEvent && 'id' in (stationOrEvent as Station)) {
+    station = stationOrEvent as Station
+  }
   const stationId = station?.id || selectedStation.value?.id
   if (stationId) {
     router.push(`/charts?station=${stationId}`)

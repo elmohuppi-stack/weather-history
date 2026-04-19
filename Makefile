@@ -9,8 +9,8 @@ help:
 	@echo "=============================================="
 	@echo ""
 	@echo "📦 Docker Commands:"
-	@echo "  make start        - Start ALL services (docker + backend + frontend)"
-	@echo "  make stop         - Stop ALL services (docker + backend + frontend)"
+	@echo "  make start        - Start the complete local Docker stack"
+	@echo "  make stop         - Stop the complete local Docker stack"
 	@echo "  make restart      - Restart all services"
 	@echo "  make build        - Build Docker images"
 	@echo "  make clean        - Stop services and remove volumes"
@@ -56,16 +56,16 @@ help:
 	@echo ""
 
 # Docker commands
-start: start-docker start-backend start-frontend
-	@echo "🚀 All services started!"
+start: start-docker
+	@echo "🚀 Complete Docker stack started!"
 	@echo "🌐 Frontend: http://localhost:3000"
 	@echo "🌐 Backend:  http://localhost:8000"
 	@echo "🌐 Adminer:  http://localhost:8080"
 	@echo "🐘 PostgreSQL: localhost:5432"
 	@echo "🔴 Redis:    localhost:6379"
 
-stop: stop-docker stop-backend stop-frontend
-	@echo "🛑 All services stopped!"
+stop: stop-docker
+	@echo "🛑 Complete Docker stack stopped!"
 
 restart: stop start
 
@@ -104,12 +104,14 @@ backend:
 
 # Individual service control commands
 start-docker:
-	@echo "🐳 Starting Docker services..."
-	cd docker/development && docker-compose up -d postgres redis adminer
-	@echo "✅ Docker services started:"
+	@echo "🐳 Starting complete Docker stack..."
+	cd docker/development && docker-compose up -d --build
+	@echo "✅ Docker stack started:"
+	@echo "  • Frontend:   http://localhost:3000"
+	@echo "  • Backend:    http://localhost:8000"
+	@echo "  • Adminer:    http://localhost:8080"
 	@echo "  • PostgreSQL: localhost:5432"
 	@echo "  • Redis:      localhost:6379"
-	@echo "  • Adminer:    http://localhost:8080"
 
 stop-docker:
 	@echo "🐳 Stopping Docker services..."

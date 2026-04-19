@@ -1,8 +1,9 @@
-# Laravel Development Dockerfile with Apache
-FROM php:8.4-apache
+# Laravel Development Dockerfile with Nginx + PHP-FPM
+FROM php:8.3-fpm
 
-# Install system dependencies
+# Install system dependencies and Nginx
 RUN apt-get update && apt-get install -y \
+    nginx \
     git \
     curl \
     libpng-dev \
@@ -13,7 +14,6 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     libzip-dev \
     && docker-php-ext-install pdo pdo_pgsql mbstring exif pcntl bcmath gd zip \
-    && a2enmod rewrite headers \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -29,8 +29,12 @@ COPY laravel-backend .
 # Copy vendor directory to use pre-installed dependencies
 COPY laravel-backend/vendor vendor/
 
-# Copy Apache configuration
-COPY docker/development/apache/laravel.conf /etc/apache2/sites-available/000-default.conf
+# Copy Nginx configuration
+COPY docker/development/nginx/laravel.conf /etc/nginx/sites-available/default
+RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+
+# Copy PHP configuration
+COPY docker/development/php/php.ini /usr/local/etc/php/conf.d/custom.ini
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
@@ -40,5 +44,8 @@ RUN chown -R www-data:www-data /var/www/html \
 # Expose port 80
 EXPOSE 80
 
-# Start Apache in foreground
-CMD ["apache2-foreground"]
+# Start script for Nginx and PHP-FPM
+COPY docker/development/start.sh /start.sh
+RUN chmod +x /start.sh
+
+CMD ["/start.sh"]

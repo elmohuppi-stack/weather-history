@@ -430,10 +430,10 @@
       <template #footer>
         <Button label="Close" severity="secondary" @click="showDetailsDialogVisible = false" />
         <Button 
-          v-if="!selectedImport.success"
+          v-if="selectedImport && !selectedImport.success"
           label="Retry Import" 
           severity="primary" 
-          @click="retryImport(selectedImport)"
+          @click="selectedImport && retryImport(selectedImport)"
         />
       </template>
     </Dialog>

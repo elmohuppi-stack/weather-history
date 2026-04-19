@@ -206,7 +206,7 @@
               </div>
             </div>
 
-            <div v-if="climateNormals.stations && climateNormals.stations.length > 0" class="overflow-x-auto">
+            <div v-if="climateNormals.monthly && climateNormals.monthly.length > 0" class="overflow-x-auto">
               <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-blue-50">
                   <tr>
@@ -244,7 +244,7 @@
                 </thead>
                 <tbody class="divide-y divide-gray-100 bg-white">
                   <tr
-                    v-for="month in (climateNormals.stations[0].monthly || [])"
+                    v-for="month in climateNormals.monthly"
                     :key="month.month"
                   >
                     <td class="px-4 py-3 text-sm font-medium text-gray-900">
@@ -254,10 +254,10 @@
                       {{ formatValue(month.temperature, "°C") }}
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-700">
-                      {{ formatValue(month.temperature_max, "°C") }}
+                      {{ formatValue(month.temp_max, "°C") }}
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-700">
-                      {{ formatValue(month.temperature_min, "°C") }}
+                      {{ formatValue(month.temp_min, "°C") }}
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-700">
                       {{ formatValue(month.precipitation, "mm") }}
@@ -305,7 +305,7 @@ const loadStationData = async (stationId: string) => {
     const [stationResponse, measurementsResponse, climateNormalsResponse] = await Promise.all([
       apiService.getStation(stationId),
       apiService.getMeasurementsByStation(stationId, { per_page: 10 }),
-      apiService.getClimateNormals({ station_ids: [stationId] }),
+      apiService.getClimateNormals(), // Get all climate normals, filter client-side
     ]);
 
     if (!stationResponse.success || !stationResponse.data) {
@@ -316,9 +316,16 @@ const loadStationData = async (stationId: string) => {
     recentMeasurements.value = measurementsResponse.success
       ? measurementsResponse.data
       : [];
-    climateNormals.value = climateNormalsResponse.success
-      ? climateNormalsResponse.data
-      : null;
+    
+    // Filter climate normals to this station
+    if (climateNormalsResponse.success && climateNormalsResponse.data?.stations) {
+      const stationClimate = climateNormalsResponse.data.stations.find(
+        (s: any) => s.station_id === stationId
+      );
+      climateNormals.value = stationClimate || null;
+    } else {
+      climateNormals.value = null;
+    }
   } catch (err) {
     console.error("Error loading station details:", err);
     error.value =

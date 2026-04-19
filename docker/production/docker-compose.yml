@@ -9,10 +9,10 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-weather_prod_password}
       POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432" # Only localhost access
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init-scripts:/docker-entrypoint-initdb.d
+      - ../development/init-scripts:/docker-entrypoint-initdb.d
     networks:
       - weather-network-prod
     healthcheck:
@@ -36,7 +36,7 @@ services:
     image: redis:7-alpine
     container_name: weather-redis-prod
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379" # Only localhost access
     volumes:
       - redis_data:/data
     networks:
@@ -70,25 +70,24 @@ services:
       redis:
         condition: service_healthy
     ports:
-      - "3032:80" # API Port für Hetzner Deployment
+      - "127.0.0.1:3031:80" # API Port - localhost only for Hetzner nginx proxy
     volumes:
       - ../../laravel-backend:/var/www/html
-      - ./nginx/laravel.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./php/php.ini:/usr/local/etc/php/conf.d/custom.ini:ro
+      - ../development/nginx/laravel.conf:/etc/nginx/conf.d/default.conf:ro
+      - ../development/php/php.ini:/usr/local/etc/php/conf.d/custom.ini:ro
     environment:
       DB_CONNECTION: pgsql
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_DATABASE: weather_history
-      DB_USERNAME: weather_user
-      DB_PASSWORD: ${DB_PASSWORD:-weather_prod_password}
+      DB_DATABASE: ${DB_DATABASE:-weather_history}
+      DB_USERNAME: ${DB_USERNAME:-weather_user}
+      DB_PASSWORD: ${DB_PASSWORD:-changeme}
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      APP_URL: ${APP_URL:-http://localhost:3032}
-      API_URL: ${API_URL:-http://localhost:3032/api}
+      APP_URL: https://${API_DOMAIN:-weather-api.elmarhepp.de}
       APP_ENV: production
       APP_DEBUG: false
-      APP_KEY: ${APP_KEY}
+      APP_KEY: ${APP_KEY:-base64:jxwGV8A4TenqVpBJ8MQqjVQM7K9pnAOhJ+kkRPh9J6w=}
       LOG_CHANNEL: stack
     networks:
       - weather-network-prod
@@ -114,12 +113,12 @@ services:
     depends_on:
       - laravel-backend
     ports:
-      - "3031:80" # Frontend Port für Hetzner Deployment
+      - "127.0.0.1:3030:80" # Frontend Port - localhost only for Hetzner nginx proxy
     volumes:
-      - ./nginx/vue.conf:/etc/nginx/conf.d/default.conf:ro
+      - ../development/nginx/vue.conf:/etc/nginx/conf.d/default.conf:ro
     environment:
-      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:3032/api}
-      VITE_APP_NAME: "Weather History DWD"
+      VITE_API_BASE_URL: https://${API_DOMAIN:-weather-api.elmarhepp.de}
+      VITE_APP_NAME: "Weather History Deutschland"
     networks:
       - weather-network-prod
     restart: unless-stopped
@@ -133,28 +132,6 @@ services:
           cpus: "0.1"
           memory: 128M
 
-  # Adminer für Datenbank-Verwaltung (nur für Entwicklung/Admin-Zugriff)
-  adminer:
-    image: adminer:latest
-    container_name: weather-adminer-prod
-    depends_on:
-      - postgres
-    ports:
-      - "8080:8080"
-    environment:
-      ADMINER_DEFAULT_SERVER: postgres
-    networks:
-      - weather-network-prod
-    restart: unless-stopped
-    # Resource limits für Hetzner CX23
-    deploy:
-      resources:
-        limits:
-          cpus: "0.1"
-          memory: 128M
-        reservations:
-          cpus: "0.05"
-          memory: 64M
 
 networks:
   weather-network-prod:

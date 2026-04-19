@@ -583,8 +583,20 @@ class StatisticsController extends Controller
             ->orderBy('month', 'asc')
             ->get();
 
-        $months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
-                   'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+        $months = [
+            'Januar',
+            'Februar',
+            'März',
+            'April',
+            'Mai',
+            'Juni',
+            'Juli',
+            'August',
+            'September',
+            'Oktober',
+            'November',
+            'Dezember'
+        ];
 
         $data = [];
         foreach ($aggregates as $agg) {

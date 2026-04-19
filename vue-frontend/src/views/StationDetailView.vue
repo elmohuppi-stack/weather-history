@@ -283,7 +283,10 @@
         </div>
 
         <!-- Yearly Aggregates Section -->
-        <div class="border-t pt-6" v-if="station && yearlyAggregates.length > 0">
+        <div
+          class="border-t pt-6"
+          v-if="station && yearlyAggregates.length > 0"
+        >
           <div class="flex items-center justify-between mb-4">
             <div>
               <h2 class="text-xl font-semibold text-gray-800">
@@ -379,7 +382,10 @@
         </div>
 
         <!-- Monthly Aggregates Section -->
-        <div class="border-t pt-6" v-if="station && selectedYear && monthlyAggregates.length > 0">
+        <div
+          class="border-t pt-6"
+          v-if="station && selectedYear && monthlyAggregates.length > 0"
+        >
           <div class="flex items-center justify-between mb-4">
             <div>
               <h2 class="text-xl font-semibold text-gray-800">
@@ -434,10 +440,7 @@
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-100 bg-white">
-                <tr
-                  v-for="month in monthlyAggregates"
-                  :key="month.month"
-                >
+                <tr v-for="month in monthlyAggregates" :key="month.month">
                   <td class="px-4 py-3 text-sm font-medium text-gray-900">
                     {{ month.month_name }}
                   </td>
@@ -504,13 +507,17 @@ const loadStationData = async (stationId: string) => {
   error.value = null;
 
   try {
-    const [stationResponse, measurementsResponse, climateNormalsResponse, yearlyResponse] =
-      await Promise.all([
-        apiService.getStation(stationId),
-        apiService.getMeasurementsByStation(stationId, { per_page: 10 }),
-        apiService.getClimateNormals(), // Get all climate normals, filter client-side
-        apiService.getYearlyAggregates({ station_id: stationId, order: 'desc' }),
-      ]);
+    const [
+      stationResponse,
+      measurementsResponse,
+      climateNormalsResponse,
+      yearlyResponse,
+    ] = await Promise.all([
+      apiService.getStation(stationId),
+      apiService.getMeasurementsByStation(stationId, { per_page: 10 }),
+      apiService.getClimateNormals(), // Get all climate normals, filter client-side
+      apiService.getYearlyAggregates({ station_id: stationId, order: "desc" }),
+    ]);
 
     if (!stationResponse.success || !stationResponse.data) {
       throw new Error("Stationsdetails konnten nicht geladen werden.");

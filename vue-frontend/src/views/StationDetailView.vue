@@ -282,6 +282,14 @@
           </div>
         </div>
 
+        <!-- Trends Chart Section -->
+        <div
+          class="border-t pt-6"
+          v-if="station && yearlyAggregates.length > 0"
+        >
+          <TrendsChart :stationId="station.id" />
+        </div>
+
         <!-- Yearly Aggregates Section -->
         <div
           class="border-t pt-6"

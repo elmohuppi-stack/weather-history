@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class YearlyAggregate extends Model
 {
     protected $table = 'yearly_aggregates';
-    
+
     protected $fillable = [
         'station_id',
         'year',
@@ -25,7 +25,7 @@ class YearlyAggregate extends Model
         'records_count',
         'valid_records',
     ];
-    
+
     protected $casts = [
         'year' => 'integer',
         'temp_max_absolute' => 'float',
@@ -41,7 +41,7 @@ class YearlyAggregate extends Model
         'records_count' => 'integer',
         'valid_records' => 'integer',
     ];
-    
+
     // Beziehung zur Station
     public function station(): BelongsTo
     {

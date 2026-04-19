@@ -19,9 +19,9 @@ class ComputeWeatherAggregates extends Command
     {
         $stationId = $this->option('station');
         $year = $this->option('year');
-        
+
         $this->info('Computing weather aggregates...');
-        
+
         // Bestimme Stationen zum Verarbeiten
         if ($stationId) {
             $stations = Station::where('id', $stationId)->get();
@@ -32,54 +32,54 @@ class ComputeWeatherAggregates extends Command
         } else {
             $stations = Station::all();
         }
-        
+
         $bar = $this->output->createProgressBar($stations->count());
-        
+
         foreach ($stations as $station) {
             $this->computeMonthlyAggregates($station, $year);
             $this->computeYearlyAggregates($station, $year);
             $bar->advance();
         }
-        
+
         $bar->finish();
         $this->newLine(2);
-        
+
         // Berechne Klima-Normen (1991-2020)
         $this->info('Computing climate normals (1991-2020)...');
         $this->computeClimateNormals();
-        
+
         $this->info('✓ Aggregates computed successfully');
         return 0;
     }
-    
+
     private function computeMonthlyAggregates(Station $station, ?string $year = null): void
     {
         // Bestimme Jahr-Range
         if ($year) {
-            $years = [$year];
+            $years = [(int)$year];
         } else {
-            $years = DailyMeasurement::where('station_id', $station->id)
-                ->selectRaw('EXTRACT(YEAR FROM date) as year')
+            $years = Measurement::where('station_id', $station->id)
+                ->selectRaw('EXTRACT(YEAR FROM date)::integer as year')
                 ->distinct()
                 ->orderBy('year')
                 ->pluck('year')
                 ->toArray();
         }
-        
+
         foreach ($years as $y) {
             for ($m = 1; $m <= 12; $m++) {
-                $startDate = "$y-" . str_pad($m, 2, '0', STR_PAD_LEFT) . "-01";
+                $startDate = (int)$y . "-" . str_pad($m, 2, '0', STR_PAD_LEFT) . "-01";
                 $endDate = date('Y-m-t', strtotime($startDate));
-                
+
                 // Hole tägliche Daten für diesen Monat
                 $measurements = Measurement::where('station_id', $station->id)
                     ->whereBetween('date', [$startDate, $endDate])
                     ->get();
-                
+
                 if ($measurements->isEmpty()) {
                     continue;
                 }
-                
+
                 // Berechne Aggregate
                 $aggregate = [
                     'station_id' => $station->id,
@@ -98,7 +98,7 @@ class ComputeWeatherAggregates extends Command
                     'records_count' => $measurements->count(),
                     'valid_records' => $measurements->whereNotNull('temp_mean')->count(),
                 ];
-                
+
                 // Speichere oder aktualisiere Aggregate
                 MonthlyAggregate::updateOrCreate(
                     ['station_id' => $station->id, 'year' => (int)$y, 'month' => $m],
@@ -107,34 +107,34 @@ class ComputeWeatherAggregates extends Command
             }
         }
     }
-    
+
     private function computeYearlyAggregates(Station $station, ?string $year = null): void
     {
         // Bestimme Jahr-Range
         if ($year) {
-            $years = [$year];
+            $years = [(int)$year];
         } else {
             $years = Measurement::where('station_id', $station->id)
-                ->selectRaw('EXTRACT(YEAR FROM date) as year')
+                ->selectRaw('EXTRACT(YEAR FROM date)::integer as year')
                 ->distinct()
                 ->orderBy('year')
                 ->pluck('year')
                 ->toArray();
         }
-        
+
         foreach ($years as $y) {
-            $startDate = "$y-01-01";
-            $endDate = "$y-12-31";
-            
+            $startDate = (int)$y . "-01-01";
+            $endDate = (int)$y . "-12-31";
+
             // Hole tägliche Daten für dieses Jahr
             $measurements = Measurement::where('station_id', $station->id)
                 ->whereBetween('date', [$startDate, $endDate])
                 ->get();
-            
+
             if ($measurements->isEmpty()) {
                 continue;
             }
-            
+
             // Berechne Aggregate
             $aggregate = [
                 'station_id' => $station->id,
@@ -152,7 +152,7 @@ class ComputeWeatherAggregates extends Command
                 'records_count' => $measurements->count(),
                 'valid_records' => $measurements->whereNotNull('temp_mean')->count(),
             ];
-            
+
             // Speichere oder aktualisiere Aggregate
             YearlyAggregate::updateOrCreate(
                 ['station_id' => $station->id, 'year' => (int)$y],
@@ -160,15 +160,15 @@ class ComputeWeatherAggregates extends Command
             );
         }
     }
-    
+
     private function computeClimateNormals(): void
     {
         // Berechne Klima-Normen für 1991-2020 (Standard 30-Jahres-Periode)
         $startYear = 1991;
         $endYear = 2020;
-        
+
         $stations = Station::all();
-        
+
         foreach ($stations as $station) {
             // Monatliche Normen
             for ($m = 1; $m <= 12; $m++) {
@@ -176,7 +176,7 @@ class ComputeWeatherAggregates extends Command
                     ->whereRaw("EXTRACT(MONTH FROM date) = ?", [$m])
                     ->whereRaw("EXTRACT(YEAR FROM date) BETWEEN ? AND ?", [$startYear, $endYear])
                     ->get();
-                
+
                 if (!$measurements->isEmpty()) {
                     $normal = [
                         'station_id' => $station->id,
@@ -189,19 +189,19 @@ class ComputeWeatherAggregates extends Command
                         'reference_period_start' => $startYear,
                         'reference_period_end' => $endYear,
                     ];
-                    
+
                     ClimateNormal::updateOrCreate(
                         ['station_id' => $station->id, 'month' => $m],
                         $normal
                     );
                 }
             }
-            
+
             // Jahres-Normal (month = 0)
             $measurements = Measurement::where('station_id', $station->id)
                 ->whereRaw("EXTRACT(YEAR FROM date) BETWEEN ? AND ?", [$startYear, $endYear])
                 ->get();
-            
+
             if (!$measurements->isEmpty()) {
                 $normal = [
                     'station_id' => $station->id,
@@ -214,7 +214,7 @@ class ComputeWeatherAggregates extends Command
                     'reference_period_start' => $startYear,
                     'reference_period_end' => $endYear,
                 ];
-                
+
                 ClimateNormal::updateOrCreate(
                     ['station_id' => $station->id, 'month' => 0],
                     $normal

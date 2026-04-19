@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ClimateNormal extends Model
 {
     protected $table = 'climate_normals';
-    
+
     protected $fillable = [
         'station_id',
         'month',
@@ -20,7 +20,7 @@ class ClimateNormal extends Model
         'reference_period_start',
         'reference_period_end',
     ];
-    
+
     protected $casts = [
         'month' => 'integer',
         'temp_mean' => 'float',
@@ -31,13 +31,13 @@ class ClimateNormal extends Model
         'reference_period_start' => 'integer',
         'reference_period_end' => 'integer',
     ];
-    
+
     // Beziehung zur Station
     public function station(): BelongsTo
     {
         return $this->belongsTo(Station::class, 'station_id', 'id');
     }
-    
+
     /**
      * Überprüfe, ob dies eine Jahresnormal ist (month=0) oder eine Monatsnormal
      */
@@ -45,7 +45,7 @@ class ClimateNormal extends Model
     {
         return $this->month === 0;
     }
-    
+
     /**
      * Rufe den Monatsnamen ab (z.B. "Januar")
      */
@@ -54,12 +54,20 @@ class ClimateNormal extends Model
         if ($this->isYearlyNormal()) {
             return 'Jahresmittel';
         }
-        
+
         $months = [
-            1 => 'Januar', 2 => 'Februar', 3 => 'März',
-            4 => 'April', 5 => 'Mai', 6 => 'Juni',
-            7 => 'Juli', 8 => 'August', 9 => 'September',
-            10 => 'Oktober', 11 => 'November', 12 => 'Dezember',
+            1 => 'Januar',
+            2 => 'Februar',
+            3 => 'März',
+            4 => 'April',
+            5 => 'Mai',
+            6 => 'Juni',
+            7 => 'Juli',
+            8 => 'August',
+            9 => 'September',
+            10 => 'Oktober',
+            11 => 'November',
+            12 => 'Dezember',
         ];
         return $months[$this->month] ?? null;
     }

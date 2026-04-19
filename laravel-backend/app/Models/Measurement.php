@@ -14,7 +14,7 @@ class Measurement extends Model
      *
      * @var string
      */
-    protected $table = 'daily_measurements';
+    protected $table = 'measurements';
 
     /**
      * The attributes that are mass assignable.

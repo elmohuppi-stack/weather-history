@@ -19,7 +19,7 @@ class StatisticsController extends Controller
     public function overall(): JsonResponse
     {
         // Get real statistics from database
-        
+
         // Station statistics
         $stationCount = Station::count();
         $activeStationCount = Station::where('active', true)->count();
@@ -29,12 +29,12 @@ class StatisticsController extends Controller
             ->get()
             ->pluck('count', 'state')
             ->toArray();
-        
+
         // Measurement statistics
         $measurementCount = Measurement::count();
         $dateRange = Measurement::selectRaw('MIN(date) as start_date, MAX(date) as end_date')
             ->first();
-        
+
         $daysDiff = 0;
         $yearsDiff = 0;
         if ($dateRange->start_date && $dateRange->end_date) {
@@ -43,9 +43,9 @@ class StatisticsController extends Controller
             $daysDiff = $start->diff($end)->days + 1;
             $yearsDiff = round($daysDiff / 365.25, 1);
         }
-        
+
         $dailyAverage = $daysDiff > 0 ? round($measurementCount / $daysDiff, 1) : 0;
-        
+
         // Get measurements by year
         $measurementsByYear = Measurement::selectRaw('EXTRACT(YEAR FROM date) as year, COUNT(*) as count')
             ->groupByRaw('EXTRACT(YEAR FROM date)')
@@ -54,7 +54,7 @@ class StatisticsController extends Controller
             ->get()
             ->pluck('count', 'year')
             ->toArray();
-        
+
         $statistics = [
             'stations' => [
                 'total' => $stationCount,
@@ -86,7 +86,7 @@ class StatisticsController extends Controller
                 'days' => $daysDiff,
             ]
         ];
-        
+
         return response()->json([
             'success' => true,
             'data' => $statistics,
@@ -103,23 +103,23 @@ class StatisticsController extends Controller
     {
         // Check if station exists
         $station = Station::find($stationId);
-        
+
         if (!$station) {
             return response()->json([
                 'success' => false,
                 'message' => 'Station not found'
             ], 404);
         }
-        
+
         // Get real statistics from database
         $measurementStats = Measurement::where('station_id', $stationId)
             ->selectRaw('COUNT(*) as total, MIN(date) as start_date, MAX(date) as end_date')
             ->first();
-        
+
         $daysDiff = 0;
         $yearsDiff = 0;
         $completeness = 0;
-        
+
         if ($measurementStats->start_date && $measurementStats->end_date) {
             $start = new \DateTime($measurementStats->start_date);
             $end = new \DateTime($measurementStats->end_date);
@@ -127,7 +127,7 @@ class StatisticsController extends Controller
             $yearsDiff = round($daysDiff / 365.25, 1);
             $completeness = $daysDiff > 0 ? round(($measurementStats->total / $daysDiff) * 100, 1) : 0;
         }
-        
+
         // Temperature statistics
         $tempStats = Measurement::where('station_id', $stationId)
             ->whereNotNull('temp_mean')
@@ -139,7 +139,7 @@ class StatisticsController extends Controller
                 AVG(CASE WHEN EXTRACT(MONTH FROM date) IN (12,1,2) THEN temp_mean END) as avg_winter
             ')
             ->first();
-        
+
         // Precipitation statistics
         $precipStats = Measurement::where('station_id', $stationId)
             ->whereNotNull('precipitation')
@@ -150,7 +150,7 @@ class StatisticsController extends Controller
                 COUNT(CASE WHEN snow_depth > 0 THEN 1 END) as snow_days
             ')
             ->first();
-        
+
         // Sunshine statistics
         $sunshineStats = Measurement::where('station_id', $stationId)
             ->whereNotNull('sunshine')
@@ -160,28 +160,28 @@ class StatisticsController extends Controller
                 COUNT(CASE WHEN sunshine > 6 THEN 1 END) as sunny_days
             ')
             ->first();
-        
+
         // Extremes
         $hottestDay = Measurement::where('station_id', $stationId)
             ->whereNotNull('temp_max')
             ->orderBy('temp_max', 'desc')
             ->first(['date', 'temp_max']);
-        
+
         $coldestDay = Measurement::where('station_id', $stationId)
             ->whereNotNull('temp_min')
             ->orderBy('temp_min', 'asc')
             ->first(['date', 'temp_min']);
-        
+
         $wettestDay = Measurement::where('station_id', $stationId)
             ->whereNotNull('precipitation')
             ->orderBy('precipitation', 'desc')
             ->first(['date', 'precipitation']);
-        
+
         $sunniestDay = Measurement::where('station_id', $stationId)
             ->whereNotNull('sunshine')
             ->orderBy('sunshine', 'desc')
             ->first(['date', 'sunshine']);
-        
+
         $statistics = [
             'station' => [
                 'id' => $station->id,
@@ -234,7 +234,7 @@ class StatisticsController extends Controller
                 ],
             ]
         ];
-        
+
         return response()->json([
             'success' => true,
             'data' => $statistics,
@@ -255,29 +255,29 @@ class StatisticsController extends Controller
             'station_ids' => 'nullable|array',
             'station_ids.*' => 'string|exists:stations,id',
         ]);
-        
+
         $period = $request->get('period', '1991-2020');
         $stationIds = $request->get('station_ids'); // null = all stations
-        
+
         // Query climate normals from database
         $query = ClimateNormal::where('reference_period_start', 1991)
             ->where('reference_period_end', 2020);
-        
+
         if ($stationIds) {
             $query->whereIn('station_id', $stationIds);
         }
-        
+
         $climateData = $query->with('station')->get();
-        
+
         // Transform data to response format
         $stations = [];
         foreach ($climateData->groupBy('station_id') as $stId => $normals) {
             $station = Station::find($stId);
             if (!$station) continue;
-            
+
             $monthlyData = [];
             $annualData = null;
-            
+
             foreach ($normals as $normal) {
                 if ($normal->month === 0) {
                     // Yearly average
@@ -300,9 +300,9 @@ class StatisticsController extends Controller
                     ];
                 }
             }
-            
+
             ksort($monthlyData);
-            
+
             $stations[] = [
                 'station_id' => $station->id,
                 'station_name' => $station->name,
@@ -312,7 +312,7 @@ class StatisticsController extends Controller
                 'monthly' => array_values($monthlyData),
             ];
         }
-        
+
         return response()->json([
             'success' => true,
             'data' => [
@@ -345,21 +345,21 @@ class StatisticsController extends Controller
             'start_year' => 'nullable|integer|min:1890|max:2026',
             'end_year' => 'nullable|integer|min:1890|max:2026',
         ]);
-        
+
         $parameter = $request->get('parameter', 'temperature');
         $stationId = $request->get('station_id');
         $startYear = $request->get('start_year', 1990);
         $endYear = $request->get('end_year', 2024);
-        
+
         // Validate station exists
         $station = Station::findOrFail($stationId);
-        
+
         // Query yearly aggregates
         $yearlyData = YearlyAggregate::where('station_id', $stationId)
             ->whereBetween('year', [$startYear, $endYear])
             ->orderBy('year', 'asc')
             ->get();
-        
+
         if ($yearlyData->isEmpty()) {
             return response()->json([
                 'success' => false,
@@ -367,14 +367,14 @@ class StatisticsController extends Controller
                 'meta' => ['station_id' => $stationId],
             ], 404);
         }
-        
+
         // Extract values based on parameter
         $values = [];
         $years = [];
-        
+
         foreach ($yearlyData as $year) {
             $years[] = $year->year;
-            
+
             if ($parameter === 'temperature') {
                 $values[] = $year->temp_mean;
             } elseif ($parameter === 'precipitation') {
@@ -383,35 +383,37 @@ class StatisticsController extends Controller
                 $values[] = $year->sunshine_hours;
             }
         }
-        
+
         // Calculate trend line (simple linear regression)
         $n = count($values);
         $xSum = array_sum(array_keys($values));
         $ySum = array_sum($values);
         $xySum = 0;
         $x2Sum = 0;
-        
+
         foreach ($values as $i => $y) {
             $x = $i;
             $xySum += $x * $y;
             $x2Sum += $x * $x;
         }
-        
+
         $slope = ($n * $xySum - $xSum * $ySum) / ($n * $x2Sum - $xSum * $xSum);
         $intercept = ($ySum - $slope * $xSum) / $n;
         $ratePerDecade = $slope * 10; // Convert annual to decadal
-        
+
         // Format annual values for response
         $annualValues = [];
         foreach ($years as $idx => $year) {
             $annualValues[$year] = round($values[$idx], 2);
         }
-        
+
         // Calculate decadal averages
         $decadalAverages = [];
-        foreach ($yearlyData->groupBy(function($item) {
-            return (intval($item->year / 10) * 10);
-        }) as $decade => $items) {
+        foreach (
+            $yearlyData->groupBy(function ($item) {
+                return (intval($item->year / 10) * 10);
+            }) as $decade => $items
+        ) {
             if ($parameter === 'temperature') {
                 $avg = $items->avg('temp_mean');
             } elseif ($parameter === 'precipitation') {
@@ -421,7 +423,7 @@ class StatisticsController extends Controller
             }
             $decadalAverages["{$decade}s"] = round($avg, 2);
         }
-        
+
         $trends = [
             'parameter' => $parameter,
             'parameter_unit' => $parameter === 'temperature' ? '°C' : ($parameter === 'precipitation' ? 'mm' : 'hours'),
@@ -446,7 +448,7 @@ class StatisticsController extends Controller
             'annual_values' => $annualValues,
             'decadal_averages' => $decadalAverages,
         ];
-        
+
         return response()->json([
             'success' => true,
             'data' => $trends,

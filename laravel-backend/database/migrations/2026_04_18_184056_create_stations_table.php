@@ -27,8 +27,9 @@ return new class extends Migration
             $table->string('dwd_url')->nullable();
             $table->timestamps();
             
-            // Add spatial index for PostGIS
-            $table->spatialIndex(['lat', 'lon']);
+            // Add indexes for performance
+            $table->index('lat');
+            $table->index('lon');
         });
     }
 

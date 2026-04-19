@@ -206,6 +206,32 @@ class ApiService {
     const response: AxiosResponse<ApiResponse<any>> = await this.client.get('/v1/exports/formats')
     return response.data
   }
+
+  // Generic HTTP methods for imports and other endpoints
+  async get<T = any>(url: string, config?: any): Promise<ApiResponse<T>> {
+    const response: AxiosResponse<ApiResponse<T>> = await this.client.get(url, config)
+    return response.data
+  }
+
+  async post<T = any>(url: string, data?: any, config?: any): Promise<ApiResponse<T>> {
+    const response: AxiosResponse<ApiResponse<T>> = await this.client.post(url, data, config)
+    return response.data
+  }
+
+  async put<T = any>(url: string, data?: any, config?: any): Promise<ApiResponse<T>> {
+    const response: AxiosResponse<ApiResponse<T>> = await this.client.put(url, data, config)
+    return response.data
+  }
+
+  async delete<T = any>(url: string, config?: any): Promise<ApiResponse<T>> {
+    const response: AxiosResponse<ApiResponse<T>> = await this.client.delete(url, config)
+    return response.data
+  }
+
+  async patch<T = any>(url: string, data?: any, config?: any): Promise<ApiResponse<T>> {
+    const response: AxiosResponse<ApiResponse<T>> = await this.client.patch(url, data, config)
+    return response.data
+  }
 }
 
 // Create and export singleton instance

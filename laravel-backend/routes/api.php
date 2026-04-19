@@ -48,4 +48,14 @@ Route::prefix('v1')->group(function () {
     Route::get('/exports/{exportId}/status', [\App\Http\Controllers\Api\ExportController::class, 'status']);
     Route::get('/exports/{exportId}/download', [\App\Http\Controllers\Api\ExportController::class, 'download']);
     Route::get('/exports/formats', [\App\Http\Controllers\Api\ExportController::class, 'formats']);
+    
+    // Import management endpoints
+    Route::get('/imports', [\App\Http\Controllers\Api\ImportController::class, 'index']);
+    Route::get('/imports/statistics', [\App\Http\Controllers\Api\ImportController::class, 'statistics']);
+    Route::get('/imports/{id}', [\App\Http\Controllers\Api\ImportController::class, 'show']);
+    Route::get('/imports/station/{stationId}', [\App\Http\Controllers\Api\ImportController::class, 'stationImports']);
+    Route::post('/imports/trigger', [\App\Http\Controllers\Api\ImportController::class, 'triggerImport']);
+    Route::get('/imports/{id}/status', [\App\Http\Controllers\Api\ImportController::class, 'importStatus']);
+    Route::delete('/imports/{id}', [\App\Http\Controllers\Api\ImportController::class, 'destroy']);
+    Route::delete('/imports/clear-old', [\App\Http\Controllers\Api\ImportController::class, 'clearOldLogs']);
 });

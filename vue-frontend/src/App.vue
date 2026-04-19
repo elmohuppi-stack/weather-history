@@ -54,6 +54,14 @@
               <span>{{ $t('navigation.maps') }}</span>
             </router-link>
             <router-link 
+              to="/imports" 
+              class="nav-link group"
+              :class="{ 'nav-link-active': $route.path.startsWith('/imports') }"
+            >
+              <i class="pi pi-upload mr-2 group-hover:scale-110 transition-transform"></i>
+              <span>{{ $t('navigation.imports') }}</span>
+            </router-link>
+            <router-link 
               to="/export" 
               class="nav-link group"
               :class="{ 'nav-link-active': $route.path.startsWith('/export') }"
@@ -65,6 +73,9 @@
         </div>
       </div>
     </header>
+
+    <!-- Toast Container -->
+    <Toast />
 
     <!-- Main Content -->
     <main class="flex-1 py-8">
@@ -168,6 +179,7 @@
 
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
+import Toast from 'primevue/toast'
 </script>
 
 <style scoped>

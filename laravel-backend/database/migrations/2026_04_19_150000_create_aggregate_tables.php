@@ -16,14 +16,13 @@ return new class extends Migration
         Schema::create('monthly_aggregates', function (Blueprint $table) {
             $table->id();
             $table->string('station_id', 10);
-            $table->year('year');
-            $table->unsignedTinyInteger('month'); // 1-12
-            $table->unique(['station_id', 'year', 'month']);
+            $table->integer('year');
+            $table->unsignedTinyInteger('month');
             
             // Temperatur (°C)
-            $table->float('temp_max_absolute')->nullable(); // Höchsttemperatur des Monats
-            $table->float('temp_min_absolute')->nullable(); // Tiefsttemperatur des Monats
-            $table->float('temp_mean')->nullable();         // Monatsmittel
+            $table->float('temp_max_absolute')->nullable();
+            $table->float('temp_min_absolute')->nullable();
+            $table->float('temp_mean')->nullable();
             
             // Niederschlag (mm)
             $table->float('precipitation_sum')->nullable();
@@ -35,83 +34,94 @@ return new class extends Migration
             $table->float('snow_depth_max')->nullable();
             
             // Tage-Kategorien
-            $table->unsignedSmallInteger('frost_days')->default(0);      // Tage mit Tmin < 0°C
-            $table->unsignedSmallInteger('summer_days')->default(0);     // Tage mit Tmax > 25°C
-            $table->unsignedSmallInteger('rainy_days')->default(0);      // Tage mit Regen > 0.1mm
-            $table->unsignedSmallInteger('snowy_days')->default(0);      // Tage mit Schnee > 0cm
+            $table->unsignedSmallInteger('frost_days')->default(0);
+            $table->unsignedSmallInteger('summer_days')->default(0);
+            $table->unsignedSmallInteger('rainy_days')->default(0);
+            $table->unsignedSmallInteger('snowy_days')->default(0);
             
             // Datenqualität
-            $table->unsignedSmallInteger('records_count')->default(0);   // Anzahl Datensätze im Monat
-            $table->unsignedSmallInteger('valid_records')->default(0);   // Gültige Datensätze
+            $table->unsignedSmallInteger('records_count')->default(0);
+            $table->unsignedSmallInteger('valid_records')->default(0);
             
             // Metadaten
             $table->timestamps();
-            $table->foreign('station_id')->references('id')->on('stations')->onDelete('cascade');
-            $table->index(['station_id', 'year']);
         });
         
         // Jährliche Aggregate
         Schema::create('yearly_aggregates', function (Blueprint $table) {
             $table->id();
             $table->string('station_id', 10);
-            $table->year('year');
-            $table->unique(['station_id', 'year']);
+            $table->integer('year');
             
             // Temperatur (°C)
-            $table->float('temp_max_absolute')->nullable(); // Jahreshöchsttemperatur
-            $table->float('temp_min_absolute')->nullable(); // Jahrestiefsttemperatur
-            $table->float('temp_mean')->nullable();         // Jahresmittel
+            $table->float('temp_max_absolute')->nullable();
+            $table->float('temp_min_absolute')->nullable();
+            $table->float('temp_mean')->nullable();
             
             // Niederschlag (mm)
-            $table->float('precipitation_sum')->nullable(); // Jahressumme
+            $table->float('precipitation_sum')->nullable();
             
             // Sonnenschein (Stunden)
-            $table->float('sunshine_hours')->nullable();    // Jahressumme
+            $table->float('sunshine_hours')->nullable();
             
             // Schnee
             $table->float('snow_depth_max')->nullable();
             
             // Tage-Kategorien
-            $table->unsignedSmallInteger('frost_days')->default(0);      // Tage mit Tmin < 0°C
-            $table->unsignedSmallInteger('summer_days')->default(0);     // Tage mit Tmax > 25°C
-            $table->unsignedSmallInteger('rainy_days')->default(0);      // Tage mit Regen > 0.1mm
-            $table->unsignedSmallInteger('snowy_days')->default(0);      // Tage mit Schnee > 0cm
+            $table->unsignedSmallInteger('frost_days')->default(0);
+            $table->unsignedSmallInteger('summer_days')->default(0);
+            $table->unsignedSmallInteger('rainy_days')->default(0);
+            $table->unsignedSmallInteger('snowy_days')->default(0);
             
             // Datenqualität
-            $table->unsignedSmallInteger('records_count')->default(0);   // Anzahl Tage im Jahr
-            $table->unsignedSmallInteger('valid_records')->default(0);   // Gültige Datensätze
+            $table->unsignedSmallInteger('records_count')->default(0);
+            $table->unsignedSmallInteger('valid_records')->default(0);
             
             // Metadaten
             $table->timestamps();
-            $table->foreign('station_id')->references('id')->on('stations')->onDelete('cascade');
-            $table->index(['station_id', 'year']);
         });
         
-        // Klima-Normen (30-Jahres-Durchschnitte: 1991-2020 Standard)
+        // Klima-Normen (30-Jahres-Durchschnitte)
         Schema::create('climate_normals', function (Blueprint $table) {
             $table->id();
             $table->string('station_id', 10);
-            $table->unsignedTinyInteger('month'); // 1-12 für monatliche Normen, oder 0 für Jahreswert
-            $table->unique(['station_id', 'month']);
+            $table->unsignedTinyInteger('month');
             
             // Temperatur (°C) - 30-Jahres-Durchschnitte
-            $table->float('temp_mean')->nullable();         // Normaltemperatur
-            $table->float('temp_max_mean')->nullable();     // Normale Tagesmaximum
-            $table->float('temp_min_mean')->nullable();     // Normale Tagesminimum
+            $table->float('temp_mean')->nullable();
+            $table->float('temp_max_mean')->nullable();
+            $table->float('temp_min_mean')->nullable();
             
             // Niederschlag (mm)
-            $table->float('precipitation_mean')->nullable(); // Normalniederschlag
+            $table->float('precipitation_mean')->nullable();
             
             // Sonnenschein (Stunden)
             $table->float('sunshine_hours_mean')->nullable();
             
             // Referenzzeitraum
-            $table->year('reference_period_start')->default(1991);
-            $table->year('reference_period_end')->default(2020);
+            $table->integer('reference_period_start')->default(1991);
+            $table->integer('reference_period_end')->default(2020);
             
             // Metadaten
             $table->timestamps();
+        });
+        
+        // Indexes und Constraints hinzufügen (nach Tabellenerstellung)
+        Schema::table('monthly_aggregates', function (Blueprint $table) {
             $table->foreign('station_id')->references('id')->on('stations')->onDelete('cascade');
+            $table->unique(['station_id', 'year', 'month']);
+            $table->index(['station_id', 'year']);
+        });
+        
+        Schema::table('yearly_aggregates', function (Blueprint $table) {
+            $table->foreign('station_id')->references('id')->on('stations')->onDelete('cascade');
+            $table->unique(['station_id', 'year']);
+            $table->index(['station_id', 'year']);
+        });
+        
+        Schema::table('climate_normals', function (Blueprint $table) {
+            $table->foreign('station_id')->references('id')->on('stations')->onDelete('cascade');
+            $table->unique(['station_id', 'month']);
         });
     }
 
@@ -125,3 +135,4 @@ return new class extends Migration
         Schema::dropIfExists('monthly_aggregates');
     }
 };
+

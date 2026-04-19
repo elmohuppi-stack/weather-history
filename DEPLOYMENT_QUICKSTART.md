@@ -12,13 +12,13 @@ Ich habe alles vorbereitet für ein vollständiges Production-Deployment auf Het
 
 ### ✅ Deployment Files Created
 
-| File | Purpose |
-|------|---------|
-| `DEPLOYMENT_HETZNER.md` | Complete 250+ line deployment guide |
+| File                                   | Purpose                             |
+| -------------------------------------- | ----------------------------------- |
+| `DEPLOYMENT_HETZNER.md`                | Complete 250+ line deployment guide |
 | `docker/production/docker-compose.yml` | Updated for Hetzner multi-app setup |
-| `scripts/deploy-production.sh` | One-command automated deployment |
-| `scripts/verify-production.sh` | 9-point health check verification |
-| `.env.production.example` | Environment configuration template |
+| `scripts/deploy-production.sh`         | One-command automated deployment    |
+| `scripts/verify-production.sh`         | 9-point health check verification   |
+| `.env.production.example`              | Environment configuration template  |
 
 ### ✅ Configuration
 
@@ -75,10 +75,12 @@ bash scripts/deploy-production.sh 192.0.2.1 your-email@example.com
 ```
 
 Replace:
+
 - `192.0.2.1` with your actual Hetzner IP
 - `your-email@example.com` with an email for Let's Encrypt notifications
 
 **What this script does:**
+
 - ✅ Validates all local changes are committed
 - ✅ Pushes to GitHub (origin/main)
 - ✅ SSHs to Hetzner and clones the repository
@@ -102,6 +104,7 @@ bash scripts/verify-production.sh
 ```
 
 This will check:
+
 - Docker container status
 - Port bindings (3030, 3031)
 - Database connection
@@ -122,6 +125,7 @@ Once DNS propagates (5-60 minutes):
 ## 📊 What Gets Deployed
 
 ### Frontend (Vue 3)
+
 - ✅ Interactive dashboard with 20 German weather stations
 - ✅ Map view with Leaflet
 - ✅ Advanced search and filtering
@@ -129,6 +133,7 @@ Once DNS propagates (5-60 minutes):
 - ✅ Export/Import UI
 
 ### Backend API (Laravel 11)
+
 - ✅ 20+ REST endpoints
 - ✅ Climate normals (1991-2020)
 - ✅ Trends analysis (temperature, precipitation, sunshine)
@@ -136,12 +141,14 @@ Once DNS propagates (5-60 minutes):
 - ✅ Export/Import functionality
 
 ### Database (PostgreSQL 15)
+
 - ✅ 458,707 historical measurements (1890-2026)
 - ✅ 20 German weather stations
 - ✅ Yearly and monthly aggregates
 - ✅ Climate normals reference data
 
 ### Infrastructure
+
 - ✅ Nginx reverse proxy (SSL/TLS)
 - ✅ Redis caching
 - ✅ Automated Let's Encrypt certificates
@@ -152,6 +159,7 @@ Once DNS propagates (5-60 minutes):
 ## 🔧 Maintenance After Deployment
 
 ### Check Status
+
 ```bash
 # SSH into your server
 ssh root@<your-hetzner-ip>
@@ -165,6 +173,7 @@ docker compose -f docker/production/docker-compose.yml logs -f laravel-backend
 ```
 
 ### Update Application
+
 ```bash
 cd /var/www/weather-history
 git pull origin main
@@ -172,6 +181,7 @@ docker compose -f docker/production/docker-compose.yml up -d --build
 ```
 
 ### Update Weather Data (Daily)
+
 ```bash
 # Manual import for a station
 docker compose -f docker/production/docker-compose.yml exec python-etl \
@@ -182,11 +192,12 @@ docker compose -f docker/production/docker-compose.yml exec python-etl \
 ```
 
 ### View Logs
+
 ```bash
 # Backend API logs
 docker compose -f docker/production/docker-compose.yml logs laravel-backend --tail 100
 
-# Frontend logs  
+# Frontend logs
 docker compose -f docker/production/docker-compose.yml logs vue-frontend --tail 50
 
 # Nginx logs (on host)
@@ -198,20 +209,24 @@ sudo journalctl -u nginx -n 50
 ## 🆘 Troubleshooting
 
 ### "Connection refused" when accessing website
+
 - Check DNS propagation: `nslookup weather.elmarhepp.de`
 - Check Nginx status: `sudo systemctl status nginx`
 - Check port bindings: `netstat -tlnp | grep 3030`
 
 ### "Bad Gateway" (502)
+
 - Check Laravel backend: `docker ps | grep laravel`
 - Check API logs: `docker compose -f docker/production/docker-compose.yml logs laravel-backend`
 - Restart: `docker compose -f docker/production/docker-compose.yml restart laravel-backend`
 
 ### "Connection to database failed"
+
 - Check PostgreSQL: `docker ps | grep postgres`
 - Test connection: `docker compose -f docker/production/docker-compose.yml exec postgres psql -U weather_user -d weather_history -c "SELECT 1"`
 
 ### Need to reset everything
+
 ```bash
 # CAUTION: This deletes all data!
 docker compose -f docker/production/docker-compose.yml down -v
@@ -225,17 +240,20 @@ docker compose -f docker/production/docker-compose.yml exec laravel-backend php 
 ## 📈 Performance Expectations
 
 ### Expected Uptime
+
 - ✅ 99.5%+ (depends on Hetzner infrastructure)
 - ✅ Automatic restarts if containers fail
 - ✅ Daily backups recommended
 
 ### Expected Response Times
+
 - Frontend homepage: <200ms
 - API /stations: <100ms
 - API /climate-normals: <150ms
 - API /trends: <200ms (depends on data size)
 
 ### Database Capacity
+
 - Current: 458,707 measurements
 - Growth rate: ~120 measurements/day
 - Projected 5-year: 678,000+ measurements
@@ -246,12 +264,14 @@ docker compose -f docker/production/docker-compose.yml exec laravel-backend php 
 ## 💡 Tips & Best Practices
 
 ### 1. Monitor Your Logs
+
 ```bash
 # Watch logs in real-time
 docker compose -f docker/production/docker-compose.yml logs -f
 ```
 
 ### 2. Regular Backups
+
 ```bash
 # Manual database backup
 docker compose -f docker/production/docker-compose.yml exec postgres \
@@ -262,6 +282,7 @@ docker compose -f docker/production/docker-compose.yml exec postgres \
 ```
 
 ### 3. Update Let's Encrypt Certificates (automatic)
+
 ```bash
 # Verify auto-renewal is working
 sudo certbot renew --dry-run
@@ -271,6 +292,7 @@ sudo certbot renew --force-renewal
 ```
 
 ### 4. Monitor Disk Space
+
 ```bash
 # Check disk usage
 df -h /var/www/weather-history
@@ -294,6 +316,7 @@ docker compose -f docker/production/docker-compose.yml exec postgres \
 ## ✅ Summary
 
 **What's Ready:**
+
 - ✅ All code is production-ready
 - ✅ Docker infrastructure configured
 - ✅ Deployment scripts automated
@@ -301,11 +324,13 @@ docker compose -f docker/production/docker-compose.yml exec postgres \
 - ✅ Monitoring and health checks prepared
 
 **Your Next Action:**
+
 ```bash
 bash scripts/deploy-production.sh <your-hetzner-ip> <your-email@example.com>
 ```
 
 **Timeline:**
+
 - Deployment script execution: **~5-10 minutes**
 - DNS propagation: **5-60 minutes**
 - SSL certificate generation: **~30 seconds**

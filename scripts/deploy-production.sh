@@ -1,25 +1,24 @@
 #!/bin/bash
 
-# Weather History Hetzner Deployment Script
-# Usage: bash deploy-production.sh <hetzner-ip> <your-email> [--force-rebuild]
-# Example: bash deploy-production.sh 192.0.2.1 admin@example.com
+# Weather History Hetzner Deployment Script (via ssh elmarhepp)
+# Usage: bash deploy-production.sh <your-email> [--force-rebuild]
+# Example: bash deploy-production.sh admin@example.com
 
 set -e
 
-HETZNER_IP="${1}"
-EMAIL="${2}"
-FORCE_REBUILD="${3:-}"
+EMAIL="${1}"
+FORCE_REBUILD="${2:-}"
 
-if [ -z "$HETZNER_IP" ] || [ -z "$EMAIL" ]; then
-    echo "❌ Usage: bash deploy-production.sh <hetzner-ip> <your-email> [--force-rebuild]"
-    echo "Example: bash deploy-production.sh 192.0.2.1 admin@example.com"
+if [ -z "$EMAIL" ]; then
+    echo "❌ Usage: bash deploy-production.sh <your-email> [--force-rebuild]"
+    echo "Example: bash deploy-production.sh admin@example.com"
     exit 1
 fi
 
 echo "🚀 Weather History Deployment to Hetzner"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "Server: $HETZNER_IP"
-echo "Email:  $EMAIL"
+echo "Server:        ssh elmarhepp"
+echo "Email:         $EMAIL"
 echo "Force Rebuild: ${FORCE_REBUILD:-no}"
 echo ""
 
@@ -41,10 +40,10 @@ echo ""
 
 # Step 3: Connect to server and deploy
 echo "🔗 Step 3: Connecting to Hetzner server..."
-echo "Note: You'll need to enter your Hetzner password/key"
+echo "Note: Uses 'ssh elmarhepp' alias configured in ~/.ssh/config"
 echo ""
 
-ssh -i ~/.ssh/id_rsa root@${HETZNER_IP} << EOSSH
+ssh elmarhepp << EOSSH
 set -e
 
 # Colors for output
@@ -271,9 +270,9 @@ echo -e "\${GREEN}║ 🎉 Deployment Complete!               ║\${NC}"
 echo -e "\${GREEN}╚════════════════════════════════════════╝\${NC}"
 echo ""
 echo -e "\${BLUE}Next Steps:\${NC}"
-echo "1. Verify DNS at Spaceship:"
-echo "   Type: A, Host: @,  Value: $HETZNER_IP"
-echo "   Type: A, Host: *, Value: $HETZNER_IP"
+echo "1. Verify DNS at Spaceship is configured:"
+echo "   Type: A, Host: @,  Value: <your-hetzner-ip>"
+echo "   Type: A, Host: *, Value: <your-hetzner-ip>"
 echo ""
 echo "2. Test the application:"
 echo "   Frontend: https://weather.elmarhepp.de"
@@ -287,10 +286,10 @@ EOSSH
 
 echo -e "✅ Deployment successful!"
 echo ""
-echo "📍 Next: Configure DNS at Spaceship (if not already done)"
-echo "   A @ -> $HETZNER_IP"
-echo "   A * -> $HETZNER_IP"
+echo "📍 DNS Configuration at Spaceship (if not already done):"
+echo "   Type: A, Host: @,  Value: <your-hetzner-ip>"
+echo "   Type: A, Host: *, Value: <your-hetzner-ip>"
 echo ""
-echo "🌐 Access your application:"
+echo "🌐 Access your application (after DNS propagates):"
 echo "   Frontend: https://weather.elmarhepp.de"
 echo "   API: https://weather-api.elmarhepp.de/api/v1/stations"

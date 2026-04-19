@@ -48,24 +48,33 @@ CACHE_DIR = Path(os.getenv('CACHE_DIR', 'cache'))
 for directory in [DATA_DIR, LOG_DIR, CACHE_DIR]:
     directory.mkdir(parents=True, exist_ok=True)
 
-# Ausgewählte Stationen für MVP
+# Ausgewählte 20 Fokus-Stationen
+# Kriterien: Geografische Verteilung, lange Datenreihen (teilweise ab 1860er Jahren),
+# Repräsentation aller Klimazonen Deutschlands (Küste, Flachland, Mittelgebirge, Alpen)
 SELECTED_STATIONS = [
-    '01048',  # Berlin-Tempelhof
-    '01358',  # Hamburg-Fuhlsbüttel
-    '01050',  # München-Stadt
-    '01270',  # Köln-Bonn
-    '01420',  # Frankfurt/Main
-    '01001',  # Bremen
-    '01072',  # Dresden-Klotzsche
-    '01078',  # Düsseldorf
-    '01091',  # Essen
-    '01103',  # Hannover
-    '01161',  # Leipzig
-    '01207',  # Nürnberg
-    '01297',  # Stuttgart-Echterdingen
-    '01303',  # Saarbrücken-Ensheim
-    '01346',  # Rostock-Warnemünde
-    '01427',  # Karlsruhe-Rheinstetten
+    # Grundgerüst: Großstädte + regionale Zentren (16 Stationen)
+    '01048',  # Berlin-Tempelhof (Osten)
+    '01358',  # Hamburg-Fuhlsbüttel (Norden)
+    '01050',  # München-Stadt (Süden)
+    '01270',  # Köln-Bonn (Westen)
+    '01420',  # Frankfurt/Main (Zentraldeutschland)
+    '01001',  # Bremen (Nordwesten)
+    '01072',  # Dresden-Klotzsche (Südosten)
+    '01078',  # Düsseldorf (Nordrhein-Westfalen)
+    '01091',  # Essen (Ruhrgebiet)
+    '01103',  # Hannover (Norddeutschland)
+    '01161',  # Leipzig (Ostdeutschland)
+    '01207',  # Nürnberg (Süddeutschland)
+    '01297',  # Stuttgart-Echterdingen (Baden-Württemberg)
+    '01303',  # Saarbrücken-Ensheim (Saarland)
+    '01346',  # Rostock-Warnemünde (Ostseeküste)
+    '01427',  # Karlsruhe-Rheinstetten (Rheinebene)
+    
+    # Ergänzung: Spezialstationen für Klimadiversität (4 Stationen)
+    '01110',  # Borkum (Nordseeinsel, maritimes Klima, 1891–)
+    '01051',  # Garmisch-Partenkirchen (Alpen/Hochgebirge 738m, 1893–)
+    '01315',  # Bad Marienberg (Westerwald 569m, Mittelgebirge)
+    '01308',  # Konstanz (Bodenseeregion 395m, 1864–)
 ]
 
 # Parameter-Mapping für DWD-Daten

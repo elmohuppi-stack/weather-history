@@ -106,7 +106,7 @@ class ImportLog(Base):
     __tablename__ = "import_logs"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    timestamp = Column(Date, default=date.today, nullable=False)
+    created_at = Column(Date, default=date.today, nullable=False)  # Laravel convention
     station_id = Column(String(10), ForeignKey("stations.id"))
     operation = Column(String(50), nullable=False)  # 'create', 'update', 'delete'
     records_processed = Column(Integer, default=0)

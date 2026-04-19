@@ -15,37 +15,53 @@ class StatisticsController extends Controller
      */
     public function overall(): JsonResponse
     {
-        // For now, return mock statistics
-        // In production, this would query the database
+        // Get real statistics from database
+        
+        // Station statistics
+        $stationCount = Station::count();
+        $activeStationCount = Station::where('active', true)->count();
+        $stationsByState = Station::selectRaw('state, COUNT(*) as count')
+            ->groupBy('state')
+            ->orderBy('count', 'desc')
+            ->get()
+            ->pluck('count', 'state')
+            ->toArray();
+        
+        // Measurement statistics
+        $measurementCount = Measurement::count();
+        $dateRange = Measurement::selectRaw('MIN(date) as start_date, MAX(date) as end_date')
+            ->first();
+        
+        $daysDiff = 0;
+        $yearsDiff = 0;
+        if ($dateRange->start_date && $dateRange->end_date) {
+            $start = new \DateTime($dateRange->start_date);
+            $end = new \DateTime($dateRange->end_date);
+            $daysDiff = $start->diff($end)->days + 1;
+            $yearsDiff = round($daysDiff / 365.25, 1);
+        }
+        
+        $dailyAverage = $daysDiff > 0 ? round($measurementCount / $daysDiff, 1) : 0;
+        
+        // Get measurements by year
+        $measurementsByYear = Measurement::selectRaw('EXTRACT(YEAR FROM date) as year, COUNT(*) as count')
+            ->groupByRaw('EXTRACT(YEAR FROM date)')
+            ->orderBy('year', 'desc')
+            ->limit(5)
+            ->get()
+            ->pluck('count', 'year')
+            ->toArray();
         
         $statistics = [
             'stations' => [
-                'total' => 16,
-                'active' => 16,
-                'by_state' => [
-                    'Berlin' => 1,
-                    'Bremen' => 1,
-                    'Sachsen' => 2,
-                    'NRW' => 4,
-                    'Hessen' => 1,
-                    'Hamburg' => 1,
-                    'Niedersachsen' => 1,
-                    'Baden-Württemberg' => 2,
-                    'Bayern' => 2,
-                    'Mecklenburg-Vorpommern' => 1,
-                    'Saarland' => 1,
-                ]
+                'total' => $stationCount,
+                'active' => $activeStationCount,
+                'by_state' => $stationsByState,
             ],
             'measurements' => [
-                'total' => 27405,
-                'daily_average' => 2.3,
-                'by_year' => [
-                    '2024' => 365,
-                    '2023' => 365,
-                    '2022' => 365,
-                    '2021' => 365,
-                    '2020' => 366, // leap year
-                ]
+                'total' => $measurementCount,
+                'daily_average' => $dailyAverage,
+                'by_year' => $measurementsByYear,
             ],
             'parameters' => [
                 'total' => 8,
@@ -61,10 +77,10 @@ class StatisticsController extends Controller
                 ]
             ],
             'time_range' => [
-                'start' => '1990-01-01',
-                'end' => '2024-12-31',
-                'years' => 35,
-                'days' => 12784,
+                'start' => $dateRange->start_date ?? '1990-01-01',
+                'end' => $dateRange->end_date ?? '2024-12-31',
+                'years' => $yearsDiff,
+                'days' => $daysDiff,
             ]
         ];
         
@@ -92,8 +108,76 @@ class StatisticsController extends Controller
             ], 404);
         }
         
-        // For now, return mock statistics
-        // In production, this would query the database
+        // Get real statistics from database
+        $measurementStats = Measurement::where('station_id', $stationId)
+            ->selectRaw('COUNT(*) as total, MIN(date) as start_date, MAX(date) as end_date')
+            ->first();
+        
+        $daysDiff = 0;
+        $yearsDiff = 0;
+        $completeness = 0;
+        
+        if ($measurementStats->start_date && $measurementStats->end_date) {
+            $start = new \DateTime($measurementStats->start_date);
+            $end = new \DateTime($measurementStats->end_date);
+            $daysDiff = $start->diff($end)->days + 1;
+            $yearsDiff = round($daysDiff / 365.25, 1);
+            $completeness = $daysDiff > 0 ? round(($measurementStats->total / $daysDiff) * 100, 1) : 0;
+        }
+        
+        // Temperature statistics
+        $tempStats = Measurement::where('station_id', $stationId)
+            ->whereNotNull('temp_mean')
+            ->selectRaw('
+                AVG(temp_mean) as mean,
+                MIN(temp_min) as min,
+                MAX(temp_max) as max,
+                AVG(CASE WHEN EXTRACT(MONTH FROM date) IN (6,7,8) THEN temp_mean END) as avg_summer,
+                AVG(CASE WHEN EXTRACT(MONTH FROM date) IN (12,1,2) THEN temp_mean END) as avg_winter
+            ')
+            ->first();
+        
+        // Precipitation statistics
+        $precipStats = Measurement::where('station_id', $stationId)
+            ->whereNotNull('precipitation')
+            ->selectRaw('
+                AVG(precipitation) * 365 as annual_mean,
+                MAX(precipitation) as max_daily,
+                COUNT(CASE WHEN precipitation > 0.1 THEN 1 END) as rainy_days,
+                COUNT(CASE WHEN snow_depth > 0 THEN 1 END) as snow_days
+            ')
+            ->first();
+        
+        // Sunshine statistics
+        $sunshineStats = Measurement::where('station_id', $stationId)
+            ->whereNotNull('sunshine')
+            ->selectRaw('
+                AVG(sunshine) * 365 as annual_mean,
+                MAX(sunshine) as max_daily,
+                COUNT(CASE WHEN sunshine > 6 THEN 1 END) as sunny_days
+            ')
+            ->first();
+        
+        // Extremes
+        $hottestDay = Measurement::where('station_id', $stationId)
+            ->whereNotNull('temp_max')
+            ->orderBy('temp_max', 'desc')
+            ->first(['date', 'temp_max']);
+        
+        $coldestDay = Measurement::where('station_id', $stationId)
+            ->whereNotNull('temp_min')
+            ->orderBy('temp_min', 'asc')
+            ->first(['date', 'temp_min']);
+        
+        $wettestDay = Measurement::where('station_id', $stationId)
+            ->whereNotNull('precipitation')
+            ->orderBy('precipitation', 'desc')
+            ->first(['date', 'precipitation']);
+        
+        $sunniestDay = Measurement::where('station_id', $stationId)
+            ->whereNotNull('sunshine')
+            ->orderBy('sunshine', 'desc')
+            ->first(['date', 'sunshine']);
         
         $statistics = [
             'station' => [
@@ -104,46 +188,46 @@ class StatisticsController extends Controller
                 'state' => $station->state,
             ],
             'measurements' => [
-                'total' => 12450,
-                'start_date' => '1990-01-01',
-                'end_date' => '2024-12-31',
-                'years' => 35,
-                'completeness' => 95.8,
+                'total' => $measurementStats->total ?? 0,
+                'start_date' => $measurementStats->start_date ?? null,
+                'end_date' => $measurementStats->end_date ?? null,
+                'years' => $yearsDiff,
+                'completeness' => $completeness,
             ],
             'temperature' => [
-                'mean' => 9.8,
-                'min' => -15.2,
-                'max' => 38.7,
-                'avg_summer' => 18.5,
-                'avg_winter' => 1.2,
+                'mean' => round($tempStats->mean ?? 0, 1),
+                'min' => round($tempStats->min ?? 0, 1),
+                'max' => round($tempStats->max ?? 0, 1),
+                'avg_summer' => round($tempStats->avg_summer ?? 0, 1),
+                'avg_winter' => round($tempStats->avg_winter ?? 0, 1),
             ],
             'precipitation' => [
-                'annual_mean' => 789,
-                'max_daily' => 85.3,
-                'rainy_days_per_year' => 165,
-                'snow_days_per_year' => 25,
+                'annual_mean' => round($precipStats->annual_mean ?? 0, 0),
+                'max_daily' => round($precipStats->max_daily ?? 0, 1),
+                'rainy_days_per_year' => $daysDiff > 0 ? round(($precipStats->rainy_days ?? 0) / $yearsDiff, 0) : 0,
+                'snow_days_per_year' => $daysDiff > 0 ? round(($precipStats->snow_days ?? 0) / $yearsDiff, 0) : 0,
             ],
             'sunshine' => [
-                'annual_mean' => 1845,
-                'max_daily' => 16.2,
-                'sunny_days_per_year' => 85,
+                'annual_mean' => round($sunshineStats->annual_mean ?? 0, 0),
+                'max_daily' => round($sunshineStats->max_daily ?? 0, 1),
+                'sunny_days_per_year' => $daysDiff > 0 ? round(($sunshineStats->sunny_days ?? 0) / $yearsDiff, 0) : 0,
             ],
             'extremes' => [
                 'hottest_day' => [
-                    'date' => '2019-07-25',
-                    'temperature' => 38.7,
+                    'date' => $hottestDay->date ?? null,
+                    'temperature' => round($hottestDay->temp_max ?? 0, 1),
                 ],
                 'coldest_day' => [
-                    'date' => '1991-02-14',
-                    'temperature' => -15.2,
+                    'date' => $coldestDay->date ?? null,
+                    'temperature' => round($coldestDay->temp_min ?? 0, 1),
                 ],
                 'wettest_day' => [
-                    'date' => '2002-08-12',
-                    'precipitation' => 85.3,
+                    'date' => $wettestDay->date ?? null,
+                    'precipitation' => round($wettestDay->precipitation ?? 0, 1),
                 ],
                 'sunniest_day' => [
-                    'date' => '2018-06-21',
-                    'sunshine' => 16.2,
+                    'date' => $sunniestDay->date ?? null,
+                    'sunshine' => round($sunniestDay->sunshine ?? 0, 1),
                 ],
             ]
         ];

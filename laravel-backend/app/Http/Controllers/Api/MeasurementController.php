@@ -152,42 +152,46 @@ class MeasurementController extends Controller
      */
     public function getLatest(): JsonResponse
     {
-        // For now, return mock data
-        // In production, this would query the database for latest measurements
+        // Get the latest date with measurements
+        $latestDate = Measurement::max('date');
         
-        $mockMeasurements = [
-            [
-                'station_id' => '01048',
-                'station_name' => 'Berlin-Tempelhof',
-                'date' => '2024-12-31',
-                'temp_mean' => 5.2,
-                'precipitation' => 2.1,
-                'sunshine' => 3.5,
-            ],
-            [
-                'station_id' => '01001',
-                'station_name' => 'Bremen',
-                'date' => '2024-12-31',
-                'temp_mean' => 6.1,
-                'precipitation' => 1.8,
-                'sunshine' => 4.2,
-            ],
-            [
-                'station_id' => '01072',
-                'station_name' => 'Dresden-Klotzsche',
-                'date' => '2024-12-31',
-                'temp_mean' => 4.8,
-                'precipitation' => 2.5,
-                'sunshine' => 2.9,
-            ],
-        ];
+        if (!$latestDate) {
+            return response()->json([
+                'success' => true,
+                'data' => [],
+                'meta' => [
+                    'total' => 0,
+                    'date' => null,
+                ]
+            ]);
+        }
+        
+        // Get latest measurements for all stations
+        $latestMeasurements = Measurement::with('station')
+            ->where('date', $latestDate)
+            ->orderBy('station_id')
+            ->limit(50) // Limit to 50 stations to avoid too much data
+            ->get()
+            ->map(function ($measurement) {
+                return [
+                    'station_id' => $measurement->station_id,
+                    'station_name' => $measurement->station->name ?? 'Unknown',
+                    'date' => $measurement->date,
+                    'temp_mean' => $measurement->temp_mean,
+                    'precipitation' => $measurement->precipitation,
+                    'sunshine' => $measurement->sunshine,
+                    'temp_max' => $measurement->temp_max,
+                    'temp_min' => $measurement->temp_min,
+                    'snow_depth' => $measurement->snow_depth,
+                ];
+            });
         
         return response()->json([
             'success' => true,
-            'data' => $mockMeasurements,
+            'data' => $latestMeasurements,
             'meta' => [
-                'total' => count($mockMeasurements),
-                'date' => '2024-12-31',
+                'total' => $latestMeasurements->count(),
+                'date' => $latestDate,
             ]
         ]);
     }

@@ -54,8 +54,9 @@
     <!-- Stations Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
       <!-- Station Card -->
-      <div v-for="station in stations" :key="station.id" 
-           class="card hover-lift group">
+      <router-link v-for="station in stations" :key="station.id" 
+           :to="`/stations/${station.id}`"
+           class="card hover-lift group cursor-pointer block no-underline text-inherit hover:text-inherit">
         <div class="card-body">
           <div class="flex items-start mb-6">
             <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
@@ -93,15 +94,9 @@
             </div>
           </div>
           
-          <div class="pt-6 border-t border-gray-100">
-            <router-link :to="`/stations/${station.id}`" 
-                         class="btn-primary w-full group">
-              <span>{{ $t('stations.stationCard.showDetails') }}</span>
-              <i class="pi pi-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
-            </router-link>
-          </div>
+          <!-- Removed the "Details anzeigen" button since the entire card is now clickable -->
         </div>
-      </div>
+      </router-link>
     </div>
 
     <!-- Stats Footer -->

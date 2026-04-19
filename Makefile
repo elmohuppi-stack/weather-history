@@ -97,8 +97,8 @@ backend:
 	cd laravel-backend && composer install
 	@echo "🔑 Generating application key..."
 	cd laravel-backend && php artisan key:generate
-	@echo "🗄️  Running migrations..."
-	cd laravel-backend && php artisan migrate
+	@echo "🗄️  Running migrations (if needed)..."
+	cd laravel-backend && php artisan migrate --force || echo "⚠️  Migration failed (tables may already exist), continuing..."
 	@echo "🚀 Starting development server..."
 	cd laravel-backend && php artisan serve &
 

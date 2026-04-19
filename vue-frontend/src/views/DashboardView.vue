@@ -94,8 +94,9 @@
         </div>
         <div class="card-body">
           <div class="space-y-4 scrollbar-thin max-h-96 overflow-y-auto">
-            <div v-for="station in recentStations" :key="station.id" 
-                 class="flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 transition-colors group">
+            <router-link v-for="station in recentStations" :key="station.id" 
+                 :to="{ name: 'station-detail', params: { id: station.id } }"
+                 class="flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 transition-colors group cursor-pointer block no-underline text-inherit hover:text-inherit">
               <div class="flex items-center">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
                   <i class="pi pi-map-marker text-primary-600"></i>
@@ -109,7 +110,7 @@
                   <p class="text-sm text-gray-500">Daten bis</p>
                   <p class="font-semibold text-gray-900">{{ station.latest_date }}</p>
                 </div>
-            </div>
+            </router-link>
           </div>
         </div>
         <div class="card-footer">

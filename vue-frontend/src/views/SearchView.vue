@@ -2,7 +2,9 @@
   <div class="search-view">
     <!-- Header Section -->
     <div class="mb-8">
-      <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Wetterstation Suche & Filter</h1>
+      <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        Wetterstation Suche & Filter
+      </h1>
       <p class="text-lg text-gray-600">
         Finden Sie Wetterstationen und filtern Sie nach verschiedenen Kriterien
       </p>
@@ -33,8 +35,14 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <!-- State Filter -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Bundesland</label>
-            <select v-model="selectedState" class="input-field w-full" @change="performSearch">
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >Bundesland</label
+            >
+            <select
+              v-model="selectedState"
+              class="input-field w-full"
+              @change="performSearch"
+            >
               <option value="">Alle Bundesländer</option>
               <option v-for="state in states" :key="state" :value="state">
                 {{ state }}
@@ -44,8 +52,14 @@
 
           <!-- Activity Filter -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-            <select v-model="selectedStatus" class="input-field w-full" @change="performSearch">
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >Status</label
+            >
+            <select
+              v-model="selectedStatus"
+              class="input-field w-full"
+              @change="performSearch"
+            >
               <option value="">Alle</option>
               <option value="active">Aktiv</option>
               <option value="inactive">Inaktiv</option>
@@ -54,7 +68,9 @@
 
           <!-- Elevation Filter -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Minimale Höhe (m)</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >Minimale Höhe (m)</label
+            >
             <input
               v-model.number="minElevation"
               type="number"
@@ -67,7 +83,9 @@
 
           <!-- Measurement Count Filter -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Min. Messungen</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >Min. Messungen</label
+            >
             <input
               v-model.number="minMeasurements"
               type="number"
@@ -81,7 +99,9 @@
         <!-- Date Range -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Datenstart (ab Jahr)</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >Datenstart (ab Jahr)</label
+            >
             <input
               v-model.number="startYear"
               type="number"
@@ -93,7 +113,9 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Daten bis (vor Jahr)</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >Daten bis (vor Jahr)</label
+            >
             <input
               v-model.number="endYear"
               type="number"
@@ -125,7 +147,9 @@
         <div class="text-lg text-gray-700">
           <span class="font-semibold">{{ filteredStations.length }}</span>
           <span class="text-gray-600">Stationen gefunden</span>
-          <span v-if="searchQuery" class="text-gray-500 ml-2">(für "{{ searchQuery }}")</span>
+          <span v-if="searchQuery" class="text-gray-500 ml-2"
+            >(für "{{ searchQuery }}")</span
+          >
         </div>
         <div class="flex gap-2">
           <button
@@ -136,7 +160,7 @@
               'px-3 py-2 rounded-lg text-sm font-medium transition-colors',
               currentSort === sortBy
                 ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
             ]"
           >
             {{ sortLabels[sortBy] }}
@@ -146,7 +170,10 @@
     </div>
 
     <!-- Results Grid -->
-    <div v-if="searchPerformed && filteredStations.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+    <div
+      v-if="searchPerformed && filteredStations.length > 0"
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6"
+    >
       <div
         v-for="station in filteredStations"
         :key="station.id"
@@ -164,10 +191,10 @@
                 'px-2 py-1 rounded text-xs font-medium',
                 station.active
                   ? 'bg-green-100 text-green-800'
-                  : 'bg-red-100 text-red-800'
+                  : 'bg-red-100 text-red-800',
               ]"
             >
-              {{ station.active ? 'Aktiv' : 'Inaktiv' }}
+              {{ station.active ? "Aktiv" : "Inaktiv" }}
             </span>
           </div>
         </div>
@@ -187,7 +214,9 @@
             </div>
             <div>
               <p class="text-gray-600">Messungen</p>
-              <p class="font-medium text-gray-900">{{ station.measurement_count?.toLocaleString() || '0' }}</p>
+              <p class="font-medium text-gray-900">
+                {{ station.measurement_count?.toLocaleString() || "0" }}
+              </p>
             </div>
             <div>
               <p class="text-gray-600">Start</p>
@@ -195,7 +224,9 @@
             </div>
             <div>
               <p class="text-gray-600">Aktuell</p>
-              <p class="font-medium text-gray-900">{{ formatDate(station.latest_date) }}</p>
+              <p class="font-medium text-gray-900">
+                {{ formatDate(station.latest_date) }}
+              </p>
             </div>
           </div>
           <div class="text-xs text-gray-500 pt-2 border-t">
@@ -209,10 +240,15 @@
     </div>
 
     <!-- No Results Message -->
-    <div v-else-if="searchPerformed && filteredStations.length === 0" class="card">
+    <div
+      v-else-if="searchPerformed && filteredStations.length === 0"
+      class="card"
+    >
       <div class="card-body text-center py-12">
         <i class="pi pi-inbox text-6xl text-gray-300 mb-4"></i>
-        <h3 class="text-2xl font-bold text-gray-900 mb-2">Keine Stationen gefunden</h3>
+        <h3 class="text-2xl font-bold text-gray-900 mb-2">
+          Keine Stationen gefunden
+        </h3>
         <p class="text-gray-600 mb-6">
           Versuchen Sie andere Suchkriterien oder Filter
         </p>
@@ -227,7 +263,9 @@
     <div v-if="selectedStationDetail" class="card mb-6">
       <div class="card-header">
         <div class="flex items-center justify-between">
-          <h3 class="text-xl font-bold text-gray-900">{{ selectedStationDetail.name }}</h3>
+          <h3 class="text-xl font-bold text-gray-900">
+            {{ selectedStationDetail.name }}
+          </h3>
           <button @click="selectedStationDetail = null" class="btn-secondary">
             <i class="pi pi-times mr-2"></i>
             Schließen
@@ -242,19 +280,27 @@
             <div class="space-y-3 text-sm">
               <div>
                 <p class="text-gray-600">Stationskennung</p>
-                <p class="font-medium text-gray-900">{{ selectedStationDetail.id }}</p>
+                <p class="font-medium text-gray-900">
+                  {{ selectedStationDetail.id }}
+                </p>
               </div>
               <div>
                 <p class="text-gray-600">Ort</p>
-                <p class="font-medium text-gray-900">{{ selectedStationDetail.location }}</p>
+                <p class="font-medium text-gray-900">
+                  {{ selectedStationDetail.location }}
+                </p>
               </div>
               <div>
                 <p class="text-gray-600">Bundesland</p>
-                <p class="font-medium text-gray-900">{{ selectedStationDetail.state }}</p>
+                <p class="font-medium text-gray-900">
+                  {{ selectedStationDetail.state }}
+                </p>
               </div>
               <div>
                 <p class="text-gray-600">Höhe über Meeresspiegel</p>
-                <p class="font-medium text-gray-900">{{ selectedStationDetail.elevation }} m</p>
+                <p class="font-medium text-gray-900">
+                  {{ selectedStationDetail.elevation }} m
+                </p>
               </div>
             </div>
           </div>
@@ -265,25 +311,35 @@
             <div class="space-y-3 text-sm">
               <div>
                 <p class="text-gray-600">Datenstart</p>
-                <p class="font-medium text-gray-900">{{ selectedStationDetail.start_year }}</p>
+                <p class="font-medium text-gray-900">
+                  {{ selectedStationDetail.start_year }}
+                </p>
               </div>
               <div>
                 <p class="text-gray-600">Aktuell bis</p>
-                <p class="font-medium text-gray-900">{{ formatDate(selectedStationDetail.latest_date) }}</p>
+                <p class="font-medium text-gray-900">
+                  {{ formatDate(selectedStationDetail.latest_date) }}
+                </p>
               </div>
               <div>
                 <p class="text-gray-600">Messungen</p>
-                <p class="font-medium text-gray-900">{{ selectedStationDetail.measurement_count?.toLocaleString() }}</p>
+                <p class="font-medium text-gray-900">
+                  {{
+                    selectedStationDetail.measurement_count?.toLocaleString()
+                  }}
+                </p>
               </div>
               <div>
                 <p class="text-gray-600">Status</p>
                 <p
                   :class="[
                     'font-medium',
-                    selectedStationDetail.active ? 'text-green-600' : 'text-red-600'
+                    selectedStationDetail.active
+                      ? 'text-green-600'
+                      : 'text-red-600',
                   ]"
                 >
-                  {{ selectedStationDetail.active ? 'Aktiv' : 'Inaktiv' }}
+                  {{ selectedStationDetail.active ? "Aktiv" : "Inaktiv" }}
                 </p>
               </div>
             </div>
@@ -318,181 +374,185 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { apiService, type Station } from '@/services/api'
+import { ref, computed, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { apiService, type Station } from "@/services/api";
 
-const router = useRouter()
+const router = useRouter();
 
 // State
-const stations = ref<Station[]>([])
-const searchQuery = ref('')
-const selectedState = ref('')
-const selectedStatus = ref('')
-const minElevation = ref(0)
-const minMeasurements = ref(0)
-const startYear = ref(1890)
-const endYear = ref(2026)
-const searchPerformed = ref(false)
-const selectedStationDetail = ref<Station | null>(null)
-const currentSort = ref('name')
-const isLoading = ref(true)
+const stations = ref<Station[]>([]);
+const searchQuery = ref("");
+const selectedState = ref("");
+const selectedStatus = ref("");
+const minElevation = ref(0);
+const minMeasurements = ref(0);
+const startYear = ref(1890);
+const endYear = ref(2026);
+const searchPerformed = ref(false);
+const selectedStationDetail = ref<Station | null>(null);
+const currentSort = ref("name");
+const isLoading = ref(true);
 
 // Sort options
 const sortLabels: Record<string, string> = {
-  name: 'Nach Name',
-  elevation: 'Nach Höhe',
-  measurements: 'Nach Messungen',
-  latest: 'Nach Aktuelles Datum'
-}
+  name: "Nach Name",
+  elevation: "Nach Höhe",
+  measurements: "Nach Messungen",
+  latest: "Nach Aktuelles Datum",
+};
 
 // Computed properties
 const states = computed(() => {
-  const stateSet = new Set(stations.value.map(s => s.state))
-  return Array.from(stateSet).sort()
-})
+  const stateSet = new Set(stations.value.map((s) => s.state));
+  return Array.from(stateSet).sort();
+});
 
 const filteredStations = computed(() => {
-  let results = [...stations.value]
+  let results = [...stations.value];
 
   // Full-text search
   if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
+    const query = searchQuery.value.toLowerCase();
     results = results.filter(
-      station =>
+      (station) =>
         station.name.toLowerCase().includes(query) ||
         station.id.toLowerCase().includes(query) ||
         station.location.toLowerCase().includes(query) ||
-        station.state.toLowerCase().includes(query)
-    )
+        station.state.toLowerCase().includes(query),
+    );
   }
 
   // State filter
   if (selectedState.value) {
-    results = results.filter(s => s.state === selectedState.value)
+    results = results.filter((s) => s.state === selectedState.value);
   }
 
   // Status filter
-  if (selectedStatus.value === 'active') {
-    results = results.filter(s => s.active)
-  } else if (selectedStatus.value === 'inactive') {
-    results = results.filter(s => !s.active)
+  if (selectedStatus.value === "active") {
+    results = results.filter((s) => s.active);
+  } else if (selectedStatus.value === "inactive") {
+    results = results.filter((s) => !s.active);
   }
 
   // Elevation filter
   if (minElevation.value > 0) {
-    results = results.filter(s => s.elevation >= minElevation.value)
+    results = results.filter((s) => s.elevation >= minElevation.value);
   }
 
   // Measurement count filter
   if (minMeasurements.value > 0) {
-    results = results.filter(s => (s.measurement_count || 0) >= minMeasurements.value)
+    results = results.filter(
+      (s) => (s.measurement_count || 0) >= minMeasurements.value,
+    );
   }
 
   // Date range filter
   if (startYear.value > 1890) {
-    results = results.filter(s => s.start_year <= startYear.value)
+    results = results.filter((s) => s.start_year <= startYear.value);
   }
   if (endYear.value < 2026) {
-    const endDateStr = `${endYear.value}-12-31`
-    results = results.filter(s => (s.latest_date || '') <= endDateStr)
+    const endDateStr = `${endYear.value}-12-31`;
+    results = results.filter((s) => (s.latest_date || "") <= endDateStr);
   }
 
   // Sort
-  return sortResults(results)
-})
+  return sortResults(results);
+});
 
 // Methods
 const loadStations = async () => {
   try {
-    isLoading.value = true
-    const response = await apiService.getStations()
+    isLoading.value = true;
+    const response = await apiService.getStations();
     if (response.success) {
-      stations.value = response.data || []
+      stations.value = response.data || [];
     }
   } catch (err) {
-    console.error('Error loading stations:', err)
+    console.error("Error loading stations:", err);
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
-}
+};
 
 const performSearch = () => {
-  searchPerformed.value = true
-}
+  searchPerformed.value = true;
+};
 
 const resetFilters = () => {
-  searchQuery.value = ''
-  selectedState.value = ''
-  selectedStatus.value = ''
-  minElevation.value = 0
-  minMeasurements.value = 0
-  startYear.value = 1890
-  endYear.value = 2026
-  currentSort.value = 'name'
-  searchPerformed.value = false
-  selectedStationDetail.value = null
-}
+  searchQuery.value = "";
+  selectedState.value = "";
+  selectedStatus.value = "";
+  minElevation.value = 0;
+  minMeasurements.value = 0;
+  startYear.value = 1890;
+  endYear.value = 2026;
+  currentSort.value = "name";
+  searchPerformed.value = false;
+  selectedStationDetail.value = null;
+};
 
 const sortStations = (sortBy: string) => {
-  currentSort.value = sortBy
-}
+  currentSort.value = sortBy;
+};
 
 const sortResults = (results: Station[]): Station[] => {
-  const sorted = [...results]
-  
+  const sorted = [...results];
+
   switch (currentSort.value) {
-    case 'name':
-      return sorted.sort((a, b) => a.name.localeCompare(b.name))
-    case 'elevation':
-      return sorted.sort((a, b) => b.elevation - a.elevation)
-    case 'measurements':
-      return sorted.sort((a, b) => (b.measurement_count || 0) - (a.measurement_count || 0))
-    case 'latest':
-      return sorted.sort((a, b) => 
-        (b.latest_date || '').localeCompare(a.latest_date || '')
-      )
+    case "name":
+      return sorted.sort((a, b) => a.name.localeCompare(b.name));
+    case "elevation":
+      return sorted.sort((a, b) => b.elevation - a.elevation);
+    case "measurements":
+      return sorted.sort(
+        (a, b) => (b.measurement_count || 0) - (a.measurement_count || 0),
+      );
+    case "latest":
+      return sorted.sort((a, b) =>
+        (b.latest_date || "").localeCompare(a.latest_date || ""),
+      );
     default:
-      return sorted
+      return sorted;
   }
-}
+};
 
 const selectStation = (station: Station) => {
-  selectedStationDetail.value = station
-}
+  selectedStationDetail.value = station;
+};
 
 const viewStationDetail = () => {
   if (selectedStationDetail.value) {
-    router.push(`/stations/${selectedStationDetail.value.id}`)
+    router.push(`/stations/${selectedStationDetail.value.id}`);
   }
-}
+};
 
 const viewMeasurements = () => {
   if (selectedStationDetail.value) {
-    router.push(`/charts?station=${selectedStationDetail.value.id}`)
+    router.push(`/charts?station=${selectedStationDetail.value.id}`);
   }
-}
+};
 
 const viewTrends = () => {
   if (selectedStationDetail.value) {
-    router.push(`/stations/${selectedStationDetail.value.id}#trends`)
+    router.push(`/stations/${selectedStationDetail.value.id}#trends`);
   }
-}
+};
 
 const viewOnMap = () => {
-  router.push('/maps')
-}
+  router.push("/maps");
+};
 
 const formatDate = (dateStr?: string): string => {
-  if (!dateStr) return 'unbekannt'
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('de-DE')
-}
+  if (!dateStr) return "unbekannt";
+  const date = new Date(dateStr);
+  return date.toLocaleDateString("de-DE");
+};
 
 // Lifecycle
 onMounted(() => {
-  loadStations()
-})
+  loadStations();
+});
 </script>
 
 <style scoped>

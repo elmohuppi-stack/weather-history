@@ -479,4 +479,219 @@ class StatisticsController extends Controller
             ]
         ]);
     }
+
+    /**
+     * Get yearly aggregates for a station with optional year range.
+     */
+    public function yearlyAggregates(Request $request): JsonResponse
+    {
+        $request->validate([
+            'station_id' => 'required|string|exists:stations,id',
+            'start_year' => 'nullable|integer|min:1890|max:2026',
+            'end_year' => 'nullable|integer|min:1890|max:2026',
+            'order' => 'nullable|string|in:asc,desc',
+        ]);
+
+        $stationId = $request->get('station_id');
+        $startYear = $request->get('start_year', 1990);
+        $endYear = $request->get('end_year', now()->year);
+        $order = $request->get('order', 'desc');
+
+        $station = Station::find($stationId);
+        if (!$station) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Station not found'
+            ], 404);
+        }
+
+        // Get yearly aggregates
+        $aggregates = YearlyAggregate::where('station_id', $stationId)
+            ->whereBetween('year', [$startYear, $endYear])
+            ->orderBy('year', $order)
+            ->get();
+
+        $data = [];
+        foreach ($aggregates as $agg) {
+            $data[] = [
+                'year' => $agg->year,
+                'temperature' => [
+                    'max' => round($agg->temp_max_absolute, 1),
+                    'min' => round($agg->temp_min_absolute, 1),
+                    'mean' => round($agg->temp_mean, 1),
+                ],
+                'precipitation' => round($agg->precipitation_sum, 1),
+                'sunshine' => round($agg->sunshine_hours, 1),
+                'frost_days' => $agg->frost_days,
+                'summer_days' => $agg->summer_days,
+                'rainy_days' => $agg->rainy_days,
+                'snowy_days' => $agg->snowy_days,
+                'snow_depth_max' => round($agg->snow_depth_max, 1),
+                'records_count' => $agg->records_count,
+                'valid_records' => $agg->valid_records,
+            ];
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'station' => [
+                    'id' => $station->id,
+                    'name' => $station->name,
+                    'location' => $station->location,
+                ],
+                'period' => [
+                    'start_year' => $startYear,
+                    'end_year' => $endYear,
+                ],
+                'aggregates' => $data,
+            ],
+            'meta' => [
+                'station_id' => $stationId,
+                'records' => count($data),
+                'source' => 'yearly_aggregates (database)',
+                'updated_at' => now()->toIso8601String(),
+            ]
+        ]);
+    }
+
+    /**
+     * Get monthly aggregates for a station and year.
+     */
+    public function monthlyAggregates(Request $request): JsonResponse
+    {
+        $request->validate([
+            'station_id' => 'required|string|exists:stations,id',
+            'year' => 'required|integer|min:1890|max:2026',
+        ]);
+
+        $stationId = $request->get('station_id');
+        $year = $request->get('year');
+
+        $station = Station::find($stationId);
+        if (!$station) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Station not found'
+            ], 404);
+        }
+
+        // Get monthly aggregates
+        $aggregates = DB::table('monthly_aggregates')
+            ->where('station_id', $stationId)
+            ->where('year', $year)
+            ->orderBy('month', 'asc')
+            ->get();
+
+        $months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
+                   'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+
+        $data = [];
+        foreach ($aggregates as $agg) {
+            $monthIdx = (int)$agg->month - 1;
+            $data[] = [
+                'month' => (int)$agg->month,
+                'month_name' => $months[$monthIdx] ?? 'Unknown',
+                'temperature' => [
+                    'max' => round($agg->temp_max_absolute, 1),
+                    'min' => round($agg->temp_min_absolute, 1),
+                    'mean' => round($agg->temp_mean, 1),
+                ],
+                'precipitation' => round($agg->precipitation_sum, 1),
+                'sunshine' => round($agg->sunshine_hours, 1),
+                'frost_days' => (int)$agg->frost_days,
+                'summer_days' => (int)$agg->summer_days,
+                'rainy_days' => (int)$agg->rainy_days,
+                'snowy_days' => (int)$agg->snowy_days,
+                'records_count' => (int)$agg->records_count,
+                'valid_records' => (int)$agg->valid_records,
+            ];
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'station' => [
+                    'id' => $station->id,
+                    'name' => $station->name,
+                    'location' => $station->location,
+                ],
+                'year' => $year,
+                'aggregates' => $data,
+            ],
+            'meta' => [
+                'station_id' => $stationId,
+                'records' => count($data),
+                'source' => 'monthly_aggregates (database)',
+                'updated_at' => now()->toIso8601String(),
+            ]
+        ]);
+    }
+
+    /**
+     * Get rankings for stations or years.
+     */
+    public function rankings(Request $request): JsonResponse
+    {
+        $request->validate([
+            'station_id' => 'nullable|string|exists:stations,id',
+            'metric' => 'required|string|in:warmest_year,coldest_year,wettest_year,driest_year,sunniest_year,most_frosts,most_summer_days',
+            'limit' => 'nullable|integer|min:1|max:100',
+        ]);
+
+        $stationId = $request->get('station_id');
+        $metric = $request->get('metric', 'warmest_year');
+        $limit = $request->get('limit', 10);
+
+        $query = YearlyAggregate::query();
+
+        if ($stationId) {
+            $query->where('station_id', $stationId);
+        }
+
+        // Apply sorting based on metric
+        $results = match ($metric) {
+            'warmest_year' => $query->orderBy('temp_mean', 'desc')->limit($limit)->get(),
+            'coldest_year' => $query->orderBy('temp_mean', 'asc')->limit($limit)->get(),
+            'wettest_year' => $query->orderBy('precipitation_sum', 'desc')->limit($limit)->get(),
+            'driest_year' => $query->orderBy('precipitation_sum', 'asc')->limit($limit)->get(),
+            'sunniest_year' => $query->orderBy('sunshine_hours', 'desc')->limit($limit)->get(),
+            'most_frosts' => $query->orderBy('frost_days', 'desc')->limit($limit)->get(),
+            'most_summer_days' => $query->orderBy('summer_days', 'desc')->limit($limit)->get(),
+            default => $query->orderBy('temp_mean', 'desc')->limit($limit)->get(),
+        };
+
+        $data = [];
+        foreach ($results as $idx => $result) {
+            $station = Station::find($result->station_id);
+            $data[] = [
+                'rank' => $idx + 1,
+                'year' => $result->year,
+                'station_id' => $result->station_id,
+                'station_name' => $station?->name ?? 'Unknown',
+                'temperature_mean' => round($result->temp_mean, 1),
+                'temperature_max' => round($result->temp_max_absolute, 1),
+                'temperature_min' => round($result->temp_min_absolute, 1),
+                'precipitation_sum' => round($result->precipitation_sum, 1),
+                'sunshine_hours' => round($result->sunshine_hours, 1),
+                'frost_days' => $result->frost_days,
+                'summer_days' => $result->summer_days,
+            ];
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'metric' => $metric,
+                'station_id' => $stationId,
+                'limit' => $limit,
+                'rankings' => $data,
+            ],
+            'meta' => [
+                'records' => count($data),
+                'source' => 'yearly_aggregates (database)',
+                'updated_at' => now()->toIso8601String(),
+            ]
+        ]);
+    }
 }

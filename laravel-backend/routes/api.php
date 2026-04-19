@@ -36,6 +36,9 @@ Route::prefix('v1')->group(function () {
     Route::get('/statistics/station/{stationId}', [\App\Http\Controllers\Api\StatisticsController::class, 'station']);
     Route::get('/statistics/climate-normals', [\App\Http\Controllers\Api\StatisticsController::class, 'climateNormals']);
     Route::get('/statistics/trends', [\App\Http\Controllers\Api\StatisticsController::class, 'trends']);
+    Route::get('/statistics/yearly-aggregates', [\App\Http\Controllers\Api\StatisticsController::class, 'yearlyAggregates']);
+    Route::get('/statistics/monthly-aggregates', [\App\Http\Controllers\Api\StatisticsController::class, 'monthlyAggregates']);
+    Route::get('/statistics/rankings', [\App\Http\Controllers\Api\StatisticsController::class, 'rankings']);
     
     // Map data endpoints
     Route::get('/maps/stations', [\App\Http\Controllers\Api\MapController::class, 'stations']);

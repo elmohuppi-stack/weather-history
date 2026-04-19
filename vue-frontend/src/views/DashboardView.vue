@@ -157,6 +157,20 @@
               <i class="pi pi-chevron-right text-gray-400 group-hover:text-success-600 group-hover:translate-x-1 transition-all"></i>
             </button>
             
+            <button @click="$router.push('/rankings')" 
+                    class="w-full flex items-center justify-between p-5 rounded-xl border border-gray-200 hover:border-amber-300 hover:bg-amber-50 transition-all group">
+              <div class="flex items-center">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
+                  <i class="pi pi-trophy text-amber-600 text-xl"></i>
+                </div>
+                <div class="text-left">
+                  <p class="font-semibold text-gray-900">Wetter-Rankings</p>
+                  <p class="text-sm text-gray-500">Top Jahre nach Metrik</p>
+                </div>
+              </div>
+              <i class="pi pi-chevron-right text-gray-400 group-hover:text-amber-600 group-hover:translate-x-1 transition-all"></i>
+            </button>
+
             <button @click="$router.push('/export')" 
                     class="w-full flex items-center justify-between p-5 rounded-xl border border-gray-200 hover:border-purple-300 hover:bg-purple-50 transition-all group">
               <div class="flex items-center">

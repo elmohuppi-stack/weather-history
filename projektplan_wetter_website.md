@@ -524,38 +524,69 @@ Wenn Sie mit der Umsetzung starten möchten, kann ich im nächsten Schritt direk
 - [x] **Datenbank-Schema**: Migrationen für PostgreSQL mit PostGIS; optionale Vorbereitung für TimescaleDB
 - [x] **Vue.js-Frontend-Grundgerüst**: Komponenten-Struktur, Router, Pinia Store für State Management
 - [x] **API-Integration**: Axios-Client für Kommunikation mit Laravel Backend
-- [ ] **Docker-Config für Produktion**: Mit Resource-Limits für CX23 Server
+- [x] **Docker-Config für Produktion**: Mit Resource-Limits für CX23 Server (fertiggestellt)
 
 **Hetzner-Deployment-Vorbereitung**
 - [ ] **DNS-Einträge vorbereiten**:
   - `A`-Record für `wetter-dwd.elmarhepp.de` → Hetzner-Server-IP
   - `A`-Record für `wetter-dwd-api.elmarhepp.de` → Hetzner-Server-IP
-- [ ] **Deployment-Skripte**: Docker-Compose-Production mit Ports 3031/3032
-- [ ] **Nginx-Konfiguration**: Gemäß hetzner-multi-app-template.md für Laravel + Vue.js
+- [x] **Deployment-Skripte**: Docker-Compose-Production mit Ports 3031/3032 (fertiggestellt)
+- [x] **Nginx-Konfiguration**: Gemäß hetzner-multi-app-template.md für Laravel + Vue.js (fertiggestellt)
 - [ ] **Monitoring-Setup**: Basis-Monitoring für RAM, CPU, Disk, Laravel Telescope
 - [ ] **Täglicher Update-Job**: Cronjob oder Laravel Scheduler auf Hetzner einrichten, damit neue DWD-Daten automatisch einmal täglich importiert werden
 
 **Phase 3: MVP-Optimierung (Woche 9-10)**
 - [ ] **Performance-Optimierung**: Datenbank-Indizes, Caching (Redis)
 - [ ] **Responsive Design**: Mobile/Desktop Optimierung
-- [ ] **Datenexport**: CSV/JSON Export-Funktionalität
+- [x] **Datenexport**: CSV/JSON Export-Funktionalität (API-Endpunkte implementiert)
 - [ ] **Testing**: Unit Tests für kritische Komponenten
 
 **Phase 4: MVP-Deployment (Woche 11-12)**
-- [ ] **Docker-Compose-Produktion**: Resource Limits für CX23
+- [x] **Docker-Compose-Produktion**: Resource Limits für CX23 (fertiggestellt)
 - [ ] **Hetzner-Deployment**: Nginx-Konfiguration, Certbot-Setup
 - [ ] **Monitoring**: Basis-Monitoring (RAM, CPU, Disk)
 - [ ] **Dokumentation**: Setup- und Bedienungsanleitung
 
-### 🎯 Nächste konkrete Schritte (Priorität)
+### 🎯 Aktueller Status und Nächste Schritte
 
-1. **Vue.js-Frontend API-Integration**: DashboardView.vue und StationsView.vue mit API-Service verbinden
-2. **Laravel-Backend-API erweitern**: MeasurementController, StatisticsController, MapController implementieren
-3. **Internationalisierung vervollständigen**: Alle Text in Komponenten in i18n auslagern
-4. **Hetzner-Deployment vorbereiten**: DNS, Nginx-Konfiguration, Deployment-Skripte
+#### ✅ Erledigt (seit letzter Aktualisierung)
+
+1. **Vue.js-Frontend API-Integration**: DashboardView.vue, StationsView.vue und MapsView.vue mit API-Service verbunden
+2. **Laravel-Backend-API erweitert**: Alle Controller implementiert (MeasurementController, StatisticsController, MapController, ExportController)
+3. **Internationalisierung vervollständigt**: Alle Hauptkomponenten verwenden i18n (DashboardView, MapsView, StationsView)
+4. **Hetzner-Deployment vorbereitet**: Vollständige Docker-Produktionskonfiguration mit Nginx, PHP-Optimierungen und Deployment-Skript
+
+#### 📊 Wo werden noch Mock-Daten verwendet?
+
+1. **MeasurementController**:
+   - `getLatest()`: Gibt Mock-Messdaten zurück (statt echte Datenbankabfrage)
+   - Grund: Echte Messdaten müssen noch aus DWD-Daten importiert werden
+
+2. **StatisticsController**:
+   - `overall()`: Berechnet Statistiken aus Mock-Daten (statt aggregierte Datenbankabfragen)
+   - `stationStatistics()`: Gibt Mock-Statistiken zurück
+   - `climateNormals()`: Gibt Mock-Klimanormalwerte zurück
+   - `trendAnalysis()`: Gibt Mock-Trendanalysen zurück
+
+3. **MapController**:
+   - `withinBounds()`: Gibt alle Stationen zurück (statt geografische Filterung)
+   - `heatmap()`: Gibt Mock-Heatmap-Daten zurück
+   - `clusters()`: Gibt Mock-Cluster-Daten zurück
+
+4. **ExportController**:
+   - Alle Endpunkte geben Mock-Daten zurück (statt echte Export-Generierung)
+
+#### 🚀 Nächste konkrete Schritte (Priorität)
+
+1. **Echte DWD-Daten importieren**: Python-ETL-Skript erweitern, um tatsächliche Messdaten aus DWD-ZIP-Dateien zu importieren
+2. **Mock-Daten durch echte Daten ersetzen**: Alle Controller auf echte Datenbankabfragen umstellen
+3. **DNS-Einträge konfigurieren**: A-Records für Domain auf Hetzner-Server-IP setzen
+4. **Hetzner-Deployment durchführen**: Anwendung auf Hetzner CX23 Server deployen
+5. **Monitoring einrichten**: Basis-Monitoring für Server-Ressourcen und Anwendungsgesundheit
+6. **Automatischen Datenimport einrichten**: Täglichen Cronjob für DWD-Datenupdates konfigurieren
 
 ---
 
-_Letzte Aktualisierung: 18. April 2026_  
+_Letzte Aktualisierung: 19. April 2026_  
 _Autor: GitHub Copilot_  
 _Projekt: Historische Wetterdaten Deutschland_

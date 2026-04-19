@@ -1,7 +1,7 @@
 # Weather History DWD - Makefile for local development
 # Usage: make [target]
 
-.PHONY: help start stop restart build clean logs db-shell frontend backend etl test dev prod-sim health install update start-docker stop-docker start-backend stop-backend start-frontend stop-frontend
+.PHONY: help start stop restart build clean logs db-shell frontend backend etl etl-station api-check test dev prod-sim health install update start-docker stop-docker start-backend stop-backend start-frontend stop-frontend
 
 # Default target
 help:
@@ -20,7 +20,9 @@ help:
 	@echo "🔧 Service Commands:"
 	@echo "  make frontend     - Start Vue.js frontend development server"
 	@echo "  make backend      - Start Laravel backend development server"
-	@echo "  make etl          - Run Python ETL import (sample data)"
+	@echo "  make etl          - Run historical DWD import for the selected focus stations"
+	@echo "  make etl-station  - Import a single station, e.g. make etl-station station=01048"
+	@echo "  make api-check    - Check live API station and measurement endpoints"
 	@echo "  make dev          - Quick start: start all services (docker + backend + frontend)"
 	@echo "  make prod-sim     - Production simulation (build and start all services)"
 	@echo ""
@@ -141,12 +143,29 @@ stop-frontend:
 	fi
 
 etl:
-	@echo "🐍 Running Python ETL import..."
+	@echo "🐍 Running historical DWD ETL import for the selected focus stations..."
 	@echo "📦 Installing Python dependencies..."
 	cd etl-python && pip install -r requirements.txt
-	@echo "📊 Importing sample data..."
+	@echo "📊 Importing selected historical station data..."
 	cd etl-python && python3 scripts/dwd_importer.py --init-db --import-all
 	@echo "✅ ETL import completed"
+
+etl-station:
+	@if [ -z "$(station)" ]; then \
+		echo "Usage: make etl-station station=01048"; \
+		exit 1; \
+	fi
+	@echo "🐍 Importing DWD data for station $(station)..."
+	cd etl-python && pip install -r requirements.txt
+	cd etl-python && python3 scripts/dwd_importer.py --station $(station)
+	@echo "✅ Station import completed"
+
+api-check:
+	@echo "🔎 Checking live API endpoints..."
+	@echo "--- Station 01048 ---"
+	@curl -s http://localhost:8000/api/v1/stations/01048 | head -c 800 && echo ""
+	@echo "--- Measurements 01048 ---"
+	@curl -s "http://localhost:8000/api/v1/measurements/station/01048?per_page=3" | head -c 1200 && echo ""
 
 # Test commands
 test: test-backend test-frontend

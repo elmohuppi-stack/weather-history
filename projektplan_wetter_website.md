@@ -528,6 +528,144 @@ Statistik-API und Frontend auf echte historische Kennzahlen ausrichten
 
 Produktkommunikation schärfen: historische Wetter- und Klimastatistik für Deutschland
 
+## 22. Konkreter Plan für die nächsten Schritte
+
+### Schritt 1: Fokus auf rund 20 Stationen festziehen
+
+Als erstes wird das aktuelle Kernset von 16 Stationen auf rund 20 Fokusstationen erweitert.
+
+Dafür werden folgende Punkte festgelegt:
+
+- finale Stationsliste mit regionaler Verteilung
+- Priorisierung nach historischer Tiefe und Datenqualität
+- Kennzeichnung von Referenzstationen für Vergleiche
+- saubere Dokumentation der Datenabdeckung je Station
+
+### Schritt 2: Historische Datenbasis fachlich absichern
+
+Danach wird geprüft, ob für jede Fokusstation die historischen DWD-Reihen vollständig und plausibel importiert sind.
+
+Konkret bedeutet das:
+
+- fehlende Langzeitstationen ergänzen
+- Start- und Endjahre pro Station dokumentieren
+- Datenlücken sichtbar machen
+- Qualitätskennzeichen sauber mitführen
+- Metadaten nicht nur vereinfacht, sondern möglichst DWD-nah speichern
+
+### Schritt 3: Monats- und Jahresstatistiken technisch aufbauen
+
+Das ist der wichtigste nächste Entwicklungsschritt.
+
+Aus den täglichen Messwerten werden verlässliche Aggregationen erzeugt für:
+
+- Monatsmitteltemperatur
+- Jahresmitteltemperatur
+- Monats- und Jahressummen beim Niederschlag
+- Sonnenscheinsummen
+- heiße Tage, Frosttage, Sommertage und Regentage
+- Rekorde und Anomalien gegenüber Referenzperioden
+
+### Schritt 4: Statistik-API auf echte Daten umstellen
+
+Die API muss jetzt stärker von einer Rohdaten-API zu einer echten Statistik-API werden.
+
+Zuerst umzusetzen:
+
+- echte climate normals statt Demo-Werte
+- echte Trendberechnung statt Platzhalter
+- Monats- und Jahresendpunkte für Stationen
+- Vergleichs- und Rankingendpunkte
+
+### Schritt 5: Frontend fachlich nachziehen
+
+Nach der API folgt die fokussierte Darstellung im Frontend:
+
+- Stationsdetail mit Monats- und Jahresblöcken erweitern
+- Vergleichsansichten für mehrere Stationen aufbauen
+- Statistikseite für Rekorde, Ranglisten und Trends ergänzen
+- Kartenansicht zunächst mit echten Stationen statt Platzhalterdarstellung betreiben
+
+### Schritt 6: Export und Import-Monitoring ehrlich machen
+
+Sobald die Statistikdaten stabil sind, werden die Betriebsfunktionen bereinigt:
+
+- Exporte real erzeugen statt nur simulieren
+- Importe tatsächlich auslösbar machen
+- Import-Historie und Status sauber anzeigen
+- Fehler- und Erfolgsfälle nachvollziehbar protokollieren
+
+## 23. Was an der jetzigen Implementierung konkret geändert werden muss
+
+### Bereits gut nutzbar
+
+- echte Stationsdaten sind bereits im System
+- Stationsdetailseiten arbeiten mit realen Daten
+- die Chart-Ansicht nutzt bereits echte Messreihen
+- der ETL-Import für historische DWD-Daten funktioniert grundsätzlich
+
+### Noch notwendige Backend-Änderungen
+
+1. Statistiklogik vervollständigen
+
+- Die Gesamt- und Stationsstatistiken sind schon datenbankbasiert.
+- Die Funktionen für Klimanormalwerte und Trends liefern aber noch Demo-Daten und müssen auf echte Aggregationen umgestellt werden.
+
+2. Kartenlogik fertigstellen
+
+- Die Stationsausgabe ist vorhanden.
+- Bounding-Box-Filter, Heatmap-Daten und Clusterlogik sind noch Platzhalter.
+
+3. Exportfunktion real machen
+
+- Exporterstellung, Status und Download sind aktuell noch simuliert.
+- Hier muss eine echte Datei-Generierung auf Basis der gewählten Filter folgen.
+
+4. Importsteuerung anbinden
+
+- Das Import-Backend protokolliert zwar Einträge, stößt aber noch keinen echten ETL-Lauf an.
+- Statt Zufallswerten muss später ein echter Importjob oder Python-Prozess gestartet werden.
+
+### Noch notwendige ETL-Änderungen
+
+- Stationsset von 16 auf rund 20 erweitern
+- Stationsmetadaten stärker aus DWD-Beschreibungsdateien ableiten
+- Monats- und Jahresaggregate nach Importläufen berechnen
+- Importlogs direkt aus dem ETL schreiben
+
+### Noch notwendige Frontend-Änderungen
+
+- Kartenansicht von Placeholder auf echte Kartenkomponente umstellen
+- Statistikseiten mit Monats- und Jahreskennzahlen ausbauen
+- Exportansicht an echte Exportjobs anbinden
+- Importansicht an echte Importläufe koppeln
+
+## 24. Praktische Reihenfolge für die Umsetzung
+
+### Priorität A
+
+- 20 Fokusstationen final festlegen
+- fehlende historische Importe ergänzen
+- Datenabdeckung und Qualität je Station dokumentieren
+
+### Priorität B
+
+- Monatsaggregate und Jahresaggregate einführen
+- Statistik-API mit echten Berechnungen ergänzen
+- Referenzperioden und Anomalien definieren
+
+### Priorität C
+
+- Frontend-Statistikseiten aufbauen
+- Kartenansicht mit echten Stationspunkten ausstatten
+- Vergleiche und Rankings sichtbar machen
+
+### Priorität D
+
+- Export und Importmonitoring produktiv machen
+- Performance und Caching optimieren
+- README, Bedienung und Betriebsabläufe weiter schärfen
+
 ---
 
 Diese neue Planung ersetzt die bisherige breite MVP-Ausrichtung durch einen klaren historischen Statistikfokus mit hoher fachlicher Aussagekraft und realistischer Umsetzbarkeit.

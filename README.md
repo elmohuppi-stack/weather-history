@@ -1,20 +1,23 @@
 # 🌤️ Weather History DWD
 
-Eine komplexe Wetter-Website zur Visualisierung historischer Wetterdaten deutscher Stationen vom Deutschen Wetterdienst (DWD).
+Eine Website für historische Wetter- und Klimastatistiken deutscher DWD-Stationen.
 
 ## 📋 Überblick
 
 Dieses Projekt verarbeitet und visualisiert historische Wetterdaten von deutschen Wetterstationen, die vom DWD Open Data Server unter https://opendata.dwd.de/ bereitgestellt werden.
 
-### MVP-Scope
-- **15 ausgewählte Stationen** (statt 400+)
-- **Zeitraum 1990-2024** (34 Jahre)
-- **Tägliche Daten** (KL-Format)
-- **Kernparameter**: Temperatur, Niederschlag, Sonnenscheindauer
+### Aktueller Produktfokus
+
+- **rund 20 kuratierte Stationen** statt Vollabdeckung
+- **möglichst tiefe historische Datenreihen** statt nur jüngerer Jahre
+- **tägliche DWD-Beobachtungsdaten** als Rohbasis
+- **Monats- und Jahresstatistiken** als fachlicher Kern
+- **Kernparameter**: Temperatur, Niederschlag, Sonnenscheindauer, optional Schnee
 
 ## 🏗️ Architektur
 
 ### Technologie-Stack
+
 - **Backend**: Laravel 11 (PHP) mit PostgreSQL + PostGIS
 - **Frontend**: Vue.js 3 + TypeScript + Tailwind CSS
 - **ETL/Data Processing**: Python mit wetterdienst-Package
@@ -24,6 +27,7 @@ Dieses Projekt verarbeitet und visualisiert historische Wetterdaten von deutsche
 - **Deployment**: Hetzner Cloud (CX23 Server)
 
 ### Projektstruktur
+
 ```
 weather-history/
 ├── laravel-backend/          # Laravel 11 API
@@ -39,6 +43,7 @@ weather-history/
 ## 🚀 Schnellstart
 
 ### Voraussetzungen
+
 - Docker Desktop
 - Git
 - Node.js 18+ (für lokale Frontend-Entwicklung)
@@ -46,13 +51,29 @@ weather-history/
 
 ### Entwicklungsumgebung starten
 
+#### Empfohlener Schnellstart mit Make
+
+```bash
+make start
+make etl
+make health
+```
+
+Für einen gezielten Import einer Station:
+
+```bash
+make etl-station station=01048
+```
+
 1. **Repository klonen**
+
    ```bash
    git clone <repository-url>
    cd weather-history
    ```
 
 2. **Docker-Container starten**
+
    ```bash
    cd docker/development
    docker-compose up -d
@@ -66,6 +87,7 @@ weather-history/
    - **Redis**: localhost:6379
 
 4. **Laravel Backend einrichten**
+
    ```bash
    cd laravel-backend
    composer install
@@ -74,6 +96,7 @@ weather-history/
    ```
 
 5. **Vue.js Frontend einrichten**
+
    ```bash
    cd vue-frontend
    npm install
@@ -90,12 +113,14 @@ weather-history/
 ## 📊 Datenstruktur
 
 ### DWD Datenquelle
+
 - **URL**: https://opendata.dwd.de/
 - **Format**: ZIP-Archive mit CSV/TXT-Dateien
 - **Auflösung**: Tägliche Klimadaten (KL-Format)
 - **Parameter**: Temperatur, Niederschlag, Sonnenscheindauer, Schneehöhe
 
 ### Datenbank-Schema
+
 ```sql
 -- Stationsmetadaten
 CREATE TABLE stations (
@@ -128,6 +153,7 @@ CREATE TABLE daily_measurements (
 ## 🎯 Features
 
 ### MVP Features
+
 - [x] **Stationsübersicht** mit Kartenansicht
 - [x] **Zeitreihen-Diagramme** für Temperatur, Niederschlag, Sonne
 - [x] **Filterfunktionen** nach Station, Zeitraum, Parameter
@@ -135,17 +161,19 @@ CREATE TABLE daily_measurements (
 - [x] **Datenexport** als CSV/JSON
 - [x] **Automatisierter Datenimport** von DWD
 
-### Geplante Erweiterungen
-- [ ] Stationsvergleiche (Side-by-side)
-- [ ] Klimakennwerte (Eistage, Sommertage, Tropennächte)
-- [ ] Trendanalyse (lineare Regression)
-- [ ] Benutzerkonten für gespeicherte Analysen
-- [ ] Alert-System für Extremwerte
-- [ ] Mobile App (React Native)
+### Nächste fachliche Ausbaustufen
+
+- [ ] Stationsset auf rund 20 Langzeitstationen erweitern
+- [ ] Monats- und Jahresstatistiken vollständig integrieren
+- [ ] Klimakennwerte wie Frosttage, Sommertage und Regentage berechnen
+- [ ] Stationsvergleiche und Rankings aufbauen
+- [ ] Kartenansicht von Placeholder auf echte Stationskarte umstellen
+- [ ] Export- und Importansicht mit realen Backend-Prozessen verbinden
 
 ## 🔧 Entwicklung
 
 ### Backend (Laravel)
+
 ```bash
 cd laravel-backend
 composer install          # Abhängigkeiten installieren
@@ -155,6 +183,7 @@ php artisan test          # Tests ausführen
 ```
 
 ### Frontend (Vue.js)
+
 ```bash
 cd vue-frontend
 npm install               # Abhängigkeiten installieren
@@ -164,6 +193,7 @@ npm run test             # Tests ausführen
 ```
 
 ### Python ETL
+
 ```bash
 cd etl-python
 pip install -r requirements.txt  # Abhängigkeiten installieren
@@ -181,6 +211,7 @@ python scripts/dwd_importer.py --station 01048
 ## 🐳 Docker Entwicklung
 
 ### Container-Management
+
 ```bash
 # Alle Services starten
 docker-compose up -d
@@ -200,6 +231,7 @@ docker-compose exec postgres psql -U weather_user -d weather_history
 ```
 
 ### Datenbank-Operationen
+
 ```bash
 # Datenbank-Backup
 docker-compose exec postgres pg_dump -U weather_user weather_history > backup.sql
@@ -215,29 +247,34 @@ docker-compose up -d
 ## 🚀 Deployment (Hetzner)
 
 ### Server-Voraussetzungen
+
 - **Hetzner CX23 Server** (2 vCPU, 4 GB RAM, 40 GB SSD)
 - **Ubuntu 24.04 LTS**
 - **Docker + Docker Compose**
 
 ### Deployment-Skript
+
 ```bash
 # Auf Hetzner Server ausführen
 ./scripts/deploy-hetzner.sh
 ```
 
 ### Domains
+
 - **Frontend**: `wetter-dwd.elmarhepp.de`
 - **API**: `wetter-dwd-api.elmarhepp.de`
 
 ## 📈 Monitoring & Wartung
 
 ### Server-Monitoring
+
 - **RAM/CPU/Disk Usage**: Prometheus + Grafana
 - **Application Logs**: Laravel Telescope
 - **Database Performance**: pg_stat_statements
 - **Error Tracking**: Sentry (optional)
 
 ### Wartungsaufgaben
+
 - **Täglicher Datenimport**: Cronjob für DWD-Updates
 - **Datenbank-Optimierung**: Wöchentliches VACUUM
 - **Backup**: Tägliche Datenbank-Backups
@@ -246,6 +283,7 @@ docker-compose up -d
 ## 🤝 Mitwirken
 
 ### Git Workflow
+
 1. **Issue erstellen** für neue Features/Bugs
 2. **Branch erstellen** von `main`
 3. **Änderungen implementieren** mit Tests
@@ -254,6 +292,7 @@ docker-compose up -d
 6. **Merge in main** nach Approval
 
 ### Coding Standards
+
 - **PHP**: PSR-12 mit Laravel Pint
 - **JavaScript/TypeScript**: ESLint + Prettier
 - **Python**: Black + isort
@@ -273,6 +312,7 @@ Dieses Projekt ist unter der MIT-Lizenz lizenziert - siehe [LICENSE](LICENSE) Da
 ## 📞 Support
 
 Bei Fragen oder Problemen:
+
 1. **Issues** auf GitHub öffnen
 2. **Dokumentation** konsultieren
 3. **Community**-Foren nutzen

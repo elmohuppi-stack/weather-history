@@ -2,10 +2,9 @@
   <div class="maps-view">
     <!-- Header Section -->
     <div class="mb-8">
-      <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Interaktive Wetterkarte</h1>
+      <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{{ $t('maps.title') }}</h1>
       <p class="text-lg text-gray-600">
-        Visualisierung der 16 deutschen Wetterstationen auf einer interaktiven Karte.
-        Klicken Sie auf eine Station für detaillierte Informationen.
+        {{ $t('maps.subtitle', [16]) }}
       </p>
     </div>
 
@@ -14,25 +13,25 @@
       <div class="card-body">
         <div class="flex flex-wrap gap-4 items-center">
           <div class="flex-1 min-w-[200px]">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Parameter</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">{{ $t('maps.controls.parameter') }}</label>
             <select v-model="selectedParameter" class="input-field">
-              <option value="temperature">Temperatur</option>
-              <option value="precipitation">Niederschlag</option>
-              <option value="sunshine">Sonnenschein</option>
+              <option value="temperature">{{ $t('maps.parameters.temperature') }}</option>
+              <option value="precipitation">{{ $t('maps.parameters.precipitation') }}</option>
+              <option value="sunshine">{{ $t('maps.parameters.sunshine') }}</option>
             </select>
           </div>
           
           <div class="flex-1 min-w-[200px]">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Jahr</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">{{ $t('maps.controls.year') }}</label>
             <select v-model="selectedYear" class="input-field">
               <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
             </select>
           </div>
           
           <div class="flex-1 min-w-[200px]">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Monat</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">{{ $t('maps.controls.month') }}</label>
             <select v-model="selectedMonth" class="input-field">
-              <option value="">Gesamtjahr</option>
+              <option value="">{{ $t('maps.months.fullYear') }}</option>
               <option v-for="month in months" :key="month.value" :value="month.value">
                 {{ month.label }}
               </option>
@@ -42,7 +41,7 @@
           <div class="flex items-end">
             <button @click="loadHeatmapData" class="btn-primary">
               <i class="pi pi-refresh mr-2"></i>
-              Karte aktualisieren
+              {{ $t('maps.controls.updateMap') }}
             </button>
           </div>
         </div>
@@ -273,9 +272,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { apiService, type Station } from '@/services/api'
 
 const router = useRouter()
+const { t } = useI18n()
 
 // State
 const stations = ref<Station[]>([])

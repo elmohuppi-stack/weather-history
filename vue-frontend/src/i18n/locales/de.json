@@ -103,6 +103,155 @@
     "degreesCelsius": "°C",
     "millimeters": "mm"
   },
+  "maps": {
+    "title": "Interaktive Wetterkarte",
+    "subtitle": "Visualisierung der {0} deutschen Wetterstationen auf einer interaktiven Karte. Klicken Sie auf eine Station für detaillierte Informationen.",
+    "controls": {
+      "parameter": "Parameter",
+      "year": "Jahr",
+      "month": "Monat",
+      "updateMap": "Karte aktualisieren"
+    },
+    "parameters": {
+      "temperature": "Temperatur",
+      "precipitation": "Niederschlag",
+      "sunshine": "Sonnenschein"
+    },
+    "months": {
+      "1": "Januar",
+      "2": "Februar",
+      "3": "März",
+      "4": "April",
+      "5": "Mai",
+      "6": "Juni",
+      "7": "Juli",
+      "8": "August",
+      "9": "September",
+      "10": "Oktober",
+      "11": "November",
+      "12": "Dezember",
+      "fullYear": "Gesamtjahr"
+    },
+    "map": {
+      "title": "Deutschland Wetterstationen",
+      "stations": "{0} Stationen",
+      "toggleHeatmap": "Heatmap",
+      "toggleStations": "Stationen",
+      "legend": "Legende",
+      "weatherStation": "Wetterstation",
+      "active": "Aktiv",
+      "cities": {
+        "berlin": "Berlin",
+        "hamburg": "Hamburg",
+        "frankfurt": "Frankfurt",
+        "munich": "München"
+      }
+    },
+    "stationDetails": {
+      "title": "Station Details",
+      "id": "ID",
+      "state": "Bundesland",
+      "elevation": "Höhe",
+      "active": "Aktiv",
+      "coordinates": "Koordinaten",
+      "latitude": "Breitengrad",
+      "longitude": "Längengrad",
+      "dataUntil": "Daten bis",
+      "actions": "Aktionen",
+      "showDetails": "Details anzeigen",
+      "showMeasurements": "Messungen anzeigen",
+      "showStatistics": "Statistiken anzeigen",
+      "close": "Schließen",
+      "yes": "Ja",
+      "no": "Nein"
+    },
+    "stationsList": {
+      "title": "Alle Wetterstationen",
+      "subtitle": "Klicken Sie auf eine Station für Details",
+      "station": "Station",
+      "state": "Bundesland",
+      "elevation": "Höhe",
+      "dataUntil": "Daten bis",
+      "measurements": "Messungen",
+      "status": "Status",
+      "actions": "Aktionen",
+      "view": "Ansehen"
+    }
+  },
+  "export": {
+    "title": "Datenexport",
+    "subtitle": "Exportieren Sie Wetterdaten in verschiedenen Formaten für Ihre Analysen.",
+    "selection": {
+      "title": "Datenauswahl",
+      "stations": "Stationen",
+      "selectAll": "Alle auswählen",
+      "deselectAll": "Alle abwählen",
+      "dateRange": "Zeitraum",
+      "startYear": "Startjahr",
+      "endYear": "Endjahr",
+      "parameters": "Parameter",
+      "allParameters": "Alle Parameter"
+    },
+    "format": {
+      "title": "Exportformat",
+      "csv": "CSV (Excel kompatibel)",
+      "json": "JSON (strukturiert)",
+      "excel": "Microsoft Excel",
+      "sql": "SQL Dump"
+    },
+    "preview": {
+      "title": "Vorschau",
+      "generate": "Vorschau generieren",
+      "stations": "Stationen",
+      "years": "Jahre",
+      "estimatedSize": "Geschätzte Größe",
+      "estimatedRecords": "Geschätzte Datensätze"
+    },
+    "actions": {
+      "export": "Export starten",
+      "download": "Herunterladen",
+      "cancel": "Abbrechen"
+    },
+    "status": {
+      "pending": "Wird vorbereitet...",
+      "processing": "Wird verarbeitet...",
+      "completed": "Fertig",
+      "failed": "Fehlgeschlagen"
+    }
+  },
+  "charts": {
+    "title": "Diagramme & Analysen",
+    "subtitle": "Erstellen Sie detaillierte Diagramme für Temperatur, Niederschlag und Sonnenscheindauer.",
+    "selection": {
+      "station": "Station",
+      "parameter": "Parameter",
+      "timeRange": "Zeitraum",
+      "chartType": "Diagrammtyp"
+    },
+    "parameters": {
+      "temperature": "Temperatur",
+      "precipitation": "Niederschlag",
+      "sunshine": "Sonnenschein"
+    },
+    "chartTypes": {
+      "line": "Liniendiagramm",
+      "bar": "Balkendiagramm",
+      "scatter": "Streudiagramm"
+    },
+    "actions": {
+      "generate": "Diagramm generieren",
+      "export": "Exportieren",
+      "reset": "Zurücksetzen"
+    }
+  },
+  "api": {
+    "loading": "Lade Daten...",
+    "error": "Fehler beim Laden der Daten",
+    "retry": "Erneut versuchen",
+    "noData": "Keine Daten verfügbar",
+    "success": "Erfolgreich",
+    "failed": "Fehlgeschlagen"
+  },
   "footer": {
     "data": "Daten",
     "dailyClimateData": "Tägliche Klimadaten (KL-Format)",

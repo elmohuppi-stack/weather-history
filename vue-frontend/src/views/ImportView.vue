@@ -567,30 +567,42 @@ const getTypeSeverity = (type: string): string => {
   }
 }
 
+const getImportTypeLabel = (type: string): string => {
+  const typeObj = importTypes.value.find(t => t.value === type)
+  return typeObj?.label || type
+}
+
+const getOperationLabel = (operation: string): string => {
+  switch (operation) {
+    case 'import': return 'Import'
+    case 'update': return 'Update'
+    case 'delete': return 'Delete'
+    default: return operation
+  }
+}
+
 const loadImports = async () => {
+  console.log('🚀 loadImports() called - SIMPLE VERSION')
   loading.value = true
   try {
-    const params: any = {
-      page: currentPage.value,
-      per_page: perPage.value,
-    }
-
-    if (filters.value.type) params.type = filters.value.type
-    if (filters.value.success !== null) params.success = filters.value.success
-
-    const response = await apiService.get('/v1/imports', { params })
-    imports.value = response.data.data || []
-    totalImports.value = response.data.meta?.total || 0
+    // Simple test - just fetch the data
+    const testUrl = 'http://localhost:8000/api/v1/imports'
+    console.log('Fetching from:', testUrl)
+    
+    const response = await fetch(testUrl)
+    const data = await response.json()
+    console.log('Fetched data:', data)
+    
+    // Just assign the raw data
+    imports.value = data.data || []
+    totalImports.value = data.meta?.total || 0
+    
+    console.log('✅ Imports loaded:', imports.value.length)
   } catch (error) {
-    console.error('Failed to load imports:', error)
-    toast.add({
-      severity: 'error',
-      summary: 'Error',
-      detail: 'Failed to load import history',
-      life: 3000,
-    })
+    console.error('❌ Failed to load imports:', error)
   } finally {
     loading.value = false
+    console.log('🏁 loadImports() completed')
   }
 }
 
@@ -605,10 +617,20 @@ const loadStatistics = async () => {
 
 const loadStations = async () => {
   try {
-    const response = await apiService.get('/v1/stations')
-    stations.value = response.data.data
+    // Use the dedicated stations API method
+    const response = await apiService.getStations()
+    stations.value = response.data || []
+    console.log('Loaded stations:', stations.value.length)
   } catch (error) {
     console.error('Failed to load stations:', error)
+    // Fallback to generic get
+    try {
+      const fallbackResponse = await apiService.get('/v1/stations')
+      stations.value = fallbackResponse.data?.data || fallbackResponse.data || []
+    } catch (fallbackError) {
+      console.error('Fallback also failed:', fallbackError)
+      stations.value = []
+    }
   }
 }
 
@@ -654,8 +676,12 @@ const triggerImport = async () => {
     })
 
     showTriggerDialogVisible.value = false
-    loadImports()
-    loadStatistics()
+    
+    // Wait a moment for the database to be updated
+    setTimeout(() => {
+      loadImports()
+      loadStatistics()
+    }, 500)
   } catch (error: any) {
     console.error('Failed to trigger import:', error)
     toast.add({
@@ -698,8 +724,12 @@ const retryImport = async (importLog: ImportLog) => {
     })
 
     showDetailsDialogVisible.value = false
-    loadImports()
-    loadStatistics()
+    
+    // Wait a moment for the database to be updated
+    setTimeout(() => {
+      loadImports()
+      loadStatistics()
+    }, 500)
   } catch (error: any) {
     console.error('Failed to retry import:', error)
     toast.add({

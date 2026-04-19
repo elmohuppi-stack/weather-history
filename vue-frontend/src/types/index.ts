@@ -2,15 +2,19 @@
 export interface Station {
   id: string
   name: string
-  lat: string
-  lon: string
+  lat: number | string
+  lon: number | string
   elevation: number
   state: string
-  start_date: string
-  end_date: string
+  start_date?: string
+  end_date?: string
+  start_year?: number
+  measurement_count?: number
+  latest_date?: string
+  location?: string
   active: boolean
-  created_at: string
-  updated_at: string
+  created_at?: string
+  updated_at?: string
 }
 
 // Import log types

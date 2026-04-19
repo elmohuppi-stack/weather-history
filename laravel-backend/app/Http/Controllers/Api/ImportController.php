@@ -225,7 +225,7 @@ class ImportController extends Controller
             'data' => [
                 'import_id' => $importLog->id,
                 'type' => $validated['type'],
-                'station_id' => $validated['station_id'],
+                'station_id' => $validated['station_id'] ?? null,
                 'status' => 'pending',
                 'estimated_duration' => 'Varies based on import type',
             ],

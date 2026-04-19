@@ -62,57 +62,14 @@
           </div>
         </div>
       </div>
-      <div class="card-body p-0">
-        <!-- Map Placeholder - In production, this would be a Leaflet/Mapbox component -->
-        <div class="map-container">
-          <div class="map-placeholder">
-            <div class="map-content">
-              <div class="map-grid">
-                <!-- Simulated map with stations -->
-                <div class="relative w-full h-full bg-gradient-to-br from-blue-50 to-green-50 rounded-lg overflow-hidden">
-                  <!-- Germany outline -->
-                  <div class="absolute inset-0 flex items-center justify-center">
-                    <div class="w-4/5 h-4/5 border-2 border-gray-300 rounded-lg relative">
-                      <!-- Simulated stations -->
-                      <div v-for="station in stations" :key="station.id" 
-                           class="absolute w-6 h-6 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 border-2 border-white shadow-lg cursor-pointer hover:scale-125 transition-transform"
-                           :style="{
-                             left: `${station.lon * 0.8 + 10}%`,
-                             top: `${(1 - station.lat / 60) * 80 + 10}%`
-                           }"
-                           @click="selectStation(station)">
-                        <div class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                          {{ station.name }}
-                        </div>
-                      </div>
-                      
-                      <!-- Major cities for reference -->
-                      <div class="absolute text-xs text-gray-500" style="left: 30%; top: 20%;">Berlin</div>
-                      <div class="absolute text-xs text-gray-500" style="left: 15%; top: 40%;">Hamburg</div>
-                      <div class="absolute text-xs text-gray-500" style="left: 25%; top: 60%;">Frankfurt</div>
-                      <div class="absolute text-xs text-gray-500" style="left: 40%; top: 70%;">München</div>
-                    </div>
-                  </div>
-                  
-                  <!-- Legend -->
-                  <div class="absolute bottom-4 left-4 bg-white p-3 rounded-lg shadow-md">
-                    <h4 class="font-semibold text-gray-900 mb-2">Legende</h4>
-                    <div class="space-y-1">
-                      <div class="flex items-center">
-                        <div class="w-4 h-4 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 mr-2"></div>
-                        <span class="text-sm text-gray-600">Wetterstation</span>
-                      </div>
-                      <div class="flex items-center">
-                        <div class="w-4 h-4 rounded-full bg-green-500 mr-2"></div>
-                        <span class="text-sm text-gray-600">Aktiv</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="card-body p-0 bg-gray-50">
+        <LeafletMap 
+          :stations="stations"
+          :selectedStation="selectedStation"
+          :parameter="selectedParameter"
+          :year="selectedYear"
+          @station-selected="selectStation"
+        />
       </div>
     </div>
 
@@ -274,6 +231,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { apiService, type Station } from '@/services/api'
+import LeafletMap from '@/components/LeafletMap.vue'
 
 const router = useRouter()
 const { t } = useI18n()

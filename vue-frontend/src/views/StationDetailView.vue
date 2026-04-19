@@ -487,6 +487,11 @@
           </div>
           <TrendsChart :stationId="station.id" />
         </div>
+
+        <!-- Export/Import Section -->
+        <div class="border-t pt-6" v-if="station">
+          <ExportImportPanel />
+        </div>
       </div>
     </div>
   </div>
@@ -497,6 +502,7 @@ import { ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { apiService, type Measurement, type Station } from "@/services/api";
 import TrendsChart from "@/components/TrendsChart.vue";
+import ExportImportPanel from "@/components/ExportImportPanel.vue";
 
 const route = useRoute();
 const router = useRouter();

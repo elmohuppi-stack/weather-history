@@ -206,7 +206,10 @@
               </div>
             </div>
 
-            <div v-if="climateNormals.monthly && climateNormals.monthly.length > 0" class="overflow-x-auto">
+            <div
+              v-if="climateNormals.monthly && climateNormals.monthly.length > 0"
+              class="overflow-x-auto"
+            >
               <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-blue-50">
                   <tr>
@@ -278,6 +281,21 @@
             </div>
           </div>
         </div>
+
+        <!-- Trends & Veränderungen Section -->
+        <div class="border-t pt-6" v-if="station">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-xl font-semibold text-gray-800">
+                Trends & Veränderungen
+              </h2>
+              <p class="text-sm text-gray-500">
+                Langzeittrends für Temperatur, Niederschlag und Sonnenschein
+              </p>
+            </div>
+          </div>
+          <TrendsChart :stationId="station.id" />
+        </div>
       </div>
     </div>
   </div>
@@ -287,6 +305,7 @@
 import { ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { apiService, type Measurement, type Station } from "@/services/api";
+import TrendsChart from "@/components/TrendsChart.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -302,11 +321,12 @@ const loadStationData = async (stationId: string) => {
   error.value = null;
 
   try {
-    const [stationResponse, measurementsResponse, climateNormalsResponse] = await Promise.all([
-      apiService.getStation(stationId),
-      apiService.getMeasurementsByStation(stationId, { per_page: 10 }),
-      apiService.getClimateNormals(), // Get all climate normals, filter client-side
-    ]);
+    const [stationResponse, measurementsResponse, climateNormalsResponse] =
+      await Promise.all([
+        apiService.getStation(stationId),
+        apiService.getMeasurementsByStation(stationId, { per_page: 10 }),
+        apiService.getClimateNormals(), // Get all climate normals, filter client-side
+      ]);
 
     if (!stationResponse.success || !stationResponse.data) {
       throw new Error("Stationsdetails konnten nicht geladen werden.");
@@ -316,11 +336,14 @@ const loadStationData = async (stationId: string) => {
     recentMeasurements.value = measurementsResponse.success
       ? measurementsResponse.data
       : [];
-    
+
     // Filter climate normals to this station
-    if (climateNormalsResponse.success && climateNormalsResponse.data?.stations) {
+    if (
+      climateNormalsResponse.success &&
+      climateNormalsResponse.data?.stations
+    ) {
       const stationClimate = climateNormalsResponse.data.stations.find(
-        (s: any) => s.station_id === stationId
+        (s: any) => s.station_id === stationId,
       );
       climateNormals.value = stationClimate || null;
     } else {
@@ -396,9 +419,8 @@ const viewCharts = () => {
 };
 </script>
 
-<style scoped>
+<style scoped lang="postcss">
 .station-detail-view {
-  min-height: calc(100vh - 64px);
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  @apply min-h-screen bg-gradient-to-br from-slate-100 to-blue-200;
 }
 </style>

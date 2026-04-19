@@ -578,17 +578,22 @@ class DWDImporter:
                 station_info = data.iloc[0]
                 
                 # Erstelle Station
+                state_name = self._get_state_from_coords(
+                    float(station_info.get('lat', 0)),
+                    float(station_info.get('lon', 0))
+                )
+                
+                start_date = data['date'].min().date()
                 station = Station(
                     id=station_id,
                     name=station_info.get('station_name', f'Station {station_id}'),
+                    location=station_info.get('location', state_name or 'Germany'),  # Fallback to state or 'Germany'
                     lat=float(station_info.get('lat', 0)),
                     lon=float(station_info.get('lon', 0)),
                     elevation=int(station_info.get('elevation', 0)),
-                    state=self._get_state_from_coords(
-                        float(station_info.get('lat', 0)),
-                        float(station_info.get('lon', 0))
-                    ),
-                    start_date=data['date'].min().date(),
+                    state=state_name,
+                    start_year=start_date.year,
+                    start_date=start_date,
                     end_date=data['date'].max().date(),
                     active=True
                 )

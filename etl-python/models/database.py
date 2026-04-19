@@ -27,13 +27,18 @@ class Station(Base):
 
     id = Column(String(10), primary_key=True)  # DWD Stations-ID (z.B. 01048)
     name = Column(String(100), nullable=False)
+    location = Column(String(100), nullable=False)  # Stadt/Region
     lat = Column(Float, nullable=False)  # Breitengrad
     lon = Column(Float, nullable=False)  # Längengrad
     elevation = Column(Integer)  # Höhe über NN in Metern
-    state = Column(String(50))  # Bundesland
-    start_date = Column(Date)  # Erster verfügbarer Datensatz
-    end_date = Column(Date)  # Letzter verfügbarer Datensatz
-    active = Column(Boolean, default=True)  # Station aktiv?
+    start_year = Column(Integer, nullable=False)  # Startjahr der Daten
+    measurement_count = Column(Integer, default=0, nullable=False)  # Anzahl Messungen
+    state = Column(String(50), nullable=False)  # Bundesland
+    latest_date = Column(Date)  # Letzter verfügbarer Datensatz (Update)
+    active = Column(Boolean, default=True, nullable=False)  # Station aktiv?
+    start_date = Column(Date)  # Erster verfügbarer Datensatz (Periode)
+    end_date = Column(Date)  # Letzter verfügbarer Datensatz (Periode)
+    description = Column(String(500))  # Beschreibung
 
     # Beziehungen
     measurements = relationship(
@@ -47,7 +52,7 @@ class Station(Base):
 class DailyMeasurement(Base):
     """Tägliche Wettermessungen"""
 
-    __tablename__ = "daily_measurements"
+    __tablename__ = "measurements"
 
     station_id = Column(String(10), ForeignKey("stations.id"), primary_key=True)
     date = Column(Date, primary_key=True)

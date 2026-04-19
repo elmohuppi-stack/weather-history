@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\DailyMeasurement;
+use App\Models\Measurement;
 use App\Models\MonthlyAggregate;
 use App\Models\YearlyAggregate;
 use App\Models\ClimateNormal;
@@ -72,7 +72,7 @@ class ComputeWeatherAggregates extends Command
                 $endDate = date('Y-m-t', strtotime($startDate));
                 
                 // Hole tägliche Daten für diesen Monat
-                $measurements = DailyMeasurement::where('station_id', $station->id)
+                $measurements = Measurement::where('station_id', $station->id)
                     ->whereBetween('date', [$startDate, $endDate])
                     ->get();
                 
@@ -114,7 +114,7 @@ class ComputeWeatherAggregates extends Command
         if ($year) {
             $years = [$year];
         } else {
-            $years = DailyMeasurement::where('station_id', $station->id)
+            $years = Measurement::where('station_id', $station->id)
                 ->selectRaw('EXTRACT(YEAR FROM date) as year')
                 ->distinct()
                 ->orderBy('year')
@@ -127,7 +127,7 @@ class ComputeWeatherAggregates extends Command
             $endDate = "$y-12-31";
             
             // Hole tägliche Daten für dieses Jahr
-            $measurements = DailyMeasurement::where('station_id', $station->id)
+            $measurements = Measurement::where('station_id', $station->id)
                 ->whereBetween('date', [$startDate, $endDate])
                 ->get();
             
@@ -172,7 +172,7 @@ class ComputeWeatherAggregates extends Command
         foreach ($stations as $station) {
             // Monatliche Normen
             for ($m = 1; $m <= 12; $m++) {
-                $measurements = DailyMeasurement::where('station_id', $station->id)
+                $measurements = Measurement::where('station_id', $station->id)
                     ->whereRaw("EXTRACT(MONTH FROM date) = ?", [$m])
                     ->whereRaw("EXTRACT(YEAR FROM date) BETWEEN ? AND ?", [$startYear, $endYear])
                     ->get();
@@ -198,7 +198,7 @@ class ComputeWeatherAggregates extends Command
             }
             
             // Jahres-Normal (month = 0)
-            $measurements = DailyMeasurement::where('station_id', $station->id)
+            $measurements = Measurement::where('station_id', $station->id)
                 ->whereRaw("EXTRACT(YEAR FROM date) BETWEEN ? AND ?", [$startYear, $endYear])
                 ->get();
             

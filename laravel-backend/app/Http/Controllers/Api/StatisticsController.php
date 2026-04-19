@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Measurement;
 use App\Models\Station;
+use App\Models\ClimateNormal;
+use App\Models\YearlyAggregate;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 class StatisticsController extends Controller
 {
@@ -243,7 +246,7 @@ class StatisticsController extends Controller
     }
 
     /**
-     * Get climate normals (30-year averages).
+     * Get climate normals (30-year averages) from database.
      */
     public function climateNormals(Request $request): JsonResponse
     {
@@ -254,80 +257,93 @@ class StatisticsController extends Controller
         ]);
         
         $period = $request->get('period', '1991-2020');
+        $stationIds = $request->get('station_ids'); // null = all stations
         
-        // For now, return mock climate normals
-        // In production, this would query the database
+        // Query climate normals from database
+        $query = ClimateNormal::where('reference_period_start', 1991)
+            ->where('reference_period_end', 2020);
         
-        $normals = [
-            'period' => $period,
-            'stations' => [
-                [
-                    'station_id' => '01048',
-                    'station_name' => 'Berlin-Tempelhof',
-                    'temperature' => [
-                        'annual' => 9.8,
-                        'january' => 0.5,
-                        'july' => 19.2,
-                    ],
-                    'precipitation' => [
-                        'annual' => 589,
-                        'summer' => 185,
-                        'winter' => 125,
-                    ],
-                    'sunshine' => [
-                        'annual' => 1645,
-                        'summer' => 685,
-                        'winter' => 145,
-                    ],
-                ],
-                [
-                    'station_id' => '01001',
-                    'station_name' => 'Bremen',
-                    'temperature' => [
-                        'annual' => 9.5,
-                        'january' => 1.2,
-                        'july' => 18.8,
-                    ],
-                    'precipitation' => [
-                        'annual' => 732,
-                        'summer' => 215,
-                        'winter' => 165,
-                    ],
-                    'sunshine' => [
-                        'annual' => 1542,
-                        'summer' => 625,
-                        'winter' => 125,
-                    ],
-                ],
-            ],
-            'parameters' => [
-                'temperature' => '°C',
-                'precipitation' => 'mm',
-                'sunshine' => 'hours',
-            ]
-        ];
+        if ($stationIds) {
+            $query->whereIn('station_id', $stationIds);
+        }
+        
+        $climateData = $query->with('station')->get();
+        
+        // Transform data to response format
+        $stations = [];
+        foreach ($climateData->groupBy('station_id') as $stId => $normals) {
+            $station = Station::find($stId);
+            if (!$station) continue;
+            
+            $monthlyData = [];
+            $annualData = null;
+            
+            foreach ($normals as $normal) {
+                if ($normal->month === 0) {
+                    // Yearly average
+                    $annualData = [
+                        'temperature' => $normal->temp_mean,
+                        'temp_max' => $normal->temp_max_mean,
+                        'temp_min' => $normal->temp_min_mean,
+                        'precipitation' => $normal->precipitation_mean,
+                        'sunshine' => $normal->sunshine_hours_mean,
+                    ];
+                } else {
+                    // Monthly data
+                    $monthlyData[$normal->month] = [
+                        'month' => $normal->month,
+                        'temperature' => $normal->temp_mean,
+                        'temp_max' => $normal->temp_max_mean,
+                        'temp_min' => $normal->temp_min_mean,
+                        'precipitation' => $normal->precipitation_mean,
+                        'sunshine' => $normal->sunshine_hours_mean,
+                    ];
+                }
+            }
+            
+            ksort($monthlyData);
+            
+            $stations[] = [
+                'station_id' => $station->id,
+                'station_name' => $station->name,
+                'location' => $station->location,
+                'elevation' => $station->elevation,
+                'annual' => $annualData,
+                'monthly' => array_values($monthlyData),
+            ];
+        }
         
         return response()->json([
             'success' => true,
-            'data' => $normals,
-            'meta' => [
+            'data' => [
                 'period' => $period,
-                'station_count' => count($normals['stations']),
+                'reference_period_start' => 1991,
+                'reference_period_end' => 2020,
+                'stations' => $stations,
+                'parameters' => [
+                    'temperature' => '°C',
+                    'precipitation' => 'mm',
+                    'sunshine' => 'hours',
+                ]
+            ],
+            'meta' => [
+                'station_count' => count($stations),
+                'source' => 'climate_normals (database)',
                 'updated_at' => now()->toIso8601String(),
             ]
         ]);
     }
 
     /**
-     * Get trend analysis for a specific parameter.
+     * Get trend analysis for a specific parameter using yearly aggregates.
      */
     public function trends(Request $request): JsonResponse
     {
         $request->validate([
             'parameter' => 'required|string|in:temperature,precipitation,sunshine',
-            'station_id' => 'nullable|string|exists:stations,id',
-            'start_year' => 'nullable|integer|min:1990|max:2024',
-            'end_year' => 'nullable|integer|min:1990|max:2024',
+            'station_id' => 'required|string|exists:stations,id',
+            'start_year' => 'nullable|integer|min:1890|max:2026',
+            'end_year' => 'nullable|integer|min:1890|max:2026',
         ]);
         
         $parameter = $request->get('parameter', 'temperature');
@@ -335,46 +351,109 @@ class StatisticsController extends Controller
         $startYear = $request->get('start_year', 1990);
         $endYear = $request->get('end_year', 2024);
         
-        // For now, return mock trend data
-        // In production, this would query the database
+        // Validate station exists
+        $station = Station::findOrFail($stationId);
+        
+        // Query yearly aggregates
+        $yearlyData = YearlyAggregate::where('station_id', $stationId)
+            ->whereBetween('year', [$startYear, $endYear])
+            ->orderBy('year', 'asc')
+            ->get();
+        
+        if ($yearlyData->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => "No trend data available for station {$stationId} in period {$startYear}-{$endYear}",
+                'meta' => ['station_id' => $stationId],
+            ], 404);
+        }
+        
+        // Extract values based on parameter
+        $values = [];
+        $years = [];
+        
+        foreach ($yearlyData as $year) {
+            $years[] = $year->year;
+            
+            if ($parameter === 'temperature') {
+                $values[] = $year->temp_mean;
+            } elseif ($parameter === 'precipitation') {
+                $values[] = $year->precipitation_sum;
+            } elseif ($parameter === 'sunshine') {
+                $values[] = $year->sunshine_hours;
+            }
+        }
+        
+        // Calculate trend line (simple linear regression)
+        $n = count($values);
+        $xSum = array_sum(array_keys($values));
+        $ySum = array_sum($values);
+        $xySum = 0;
+        $x2Sum = 0;
+        
+        foreach ($values as $i => $y) {
+            $x = $i;
+            $xySum += $x * $y;
+            $x2Sum += $x * $x;
+        }
+        
+        $slope = ($n * $xySum - $xSum * $ySum) / ($n * $x2Sum - $xSum * $xSum);
+        $intercept = ($ySum - $slope * $xSum) / $n;
+        $ratePerDecade = $slope * 10; // Convert annual to decadal
+        
+        // Format annual values for response
+        $annualValues = [];
+        foreach ($years as $idx => $year) {
+            $annualValues[$year] = round($values[$idx], 2);
+        }
+        
+        // Calculate decadal averages
+        $decadalAverages = [];
+        foreach ($yearlyData->groupBy(function($item) {
+            return (intval($item->year / 10) * 10);
+        }) as $decade => $items) {
+            if ($parameter === 'temperature') {
+                $avg = $items->avg('temp_mean');
+            } elseif ($parameter === 'precipitation') {
+                $avg = $items->sum('precipitation_sum') / count($items);
+            } elseif ($parameter === 'sunshine') {
+                $avg = $items->sum('sunshine_hours') / count($items);
+            }
+            $decadalAverages["{$decade}s"] = round($avg, 2);
+        }
         
         $trends = [
             'parameter' => $parameter,
-            'station_id' => $stationId,
+            'parameter_unit' => $parameter === 'temperature' ? '°C' : ($parameter === 'precipitation' ? 'mm' : 'hours'),
+            'station' => [
+                'id' => $station->id,
+                'name' => $station->name,
+                'location' => $station->location,
+            ],
             'period' => [
                 'start_year' => $startYear,
                 'end_year' => $endYear,
                 'years' => $endYear - $startYear + 1,
             ],
             'analysis' => [
-                'trend' => 'increasing',
-                'rate_per_decade' => 0.35,
-                'significance' => 'high',
-                'r_squared' => 0.78,
+                'trend' => $slope > 0 ? 'increasing' : 'decreasing',
+                'rate_per_year' => round($slope, 4),
+                'rate_per_decade' => round($ratePerDecade, 4),
+                'min_value' => round(min($values), 2),
+                'max_value' => round(max($values), 2),
+                'mean_value' => round(array_sum($values) / count($values), 2),
             ],
-            'annual_values' => [
-                '1990' => 8.9,
-                '1995' => 9.1,
-                '2000' => 9.4,
-                '2005' => 9.6,
-                '2010' => 9.8,
-                '2015' => 10.1,
-                '2020' => 10.3,
-                '2024' => 10.5,
-            ],
-            'decadal_averages' => [
-                '1990s' => 9.2,
-                '2000s' => 9.7,
-                '2010s' => 10.0,
-                '2020s' => 10.4,
-            ]
+            'annual_values' => $annualValues,
+            'decadal_averages' => $decadalAverages,
         ];
         
         return response()->json([
             'success' => true,
             'data' => $trends,
             'meta' => [
-                'parameter' => $parameter,
+                'station_id' => $stationId,
+                'source' => 'yearly_aggregates (database)',
+                'records' => count($yearlyData),
                 'analysis_date' => now()->toIso8601String(),
             ]
         ]);

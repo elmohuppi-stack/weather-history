@@ -282,6 +282,186 @@
           </div>
         </div>
 
+        <!-- Yearly Aggregates Section -->
+        <div class="border-t pt-6" v-if="station && yearlyAggregates.length > 0">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-xl font-semibold text-gray-800">
+                Jahresaggregate
+              </h2>
+              <p class="text-sm text-gray-500">
+                Jährliche Zusammenfassungen der Wetterdaten
+              </p>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-green-50">
+                <tr>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-semibold text-green-600 uppercase"
+                  >
+                    Jahr
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-semibold text-green-600 uppercase"
+                  >
+                    Temp. Ø (°C)
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-semibold text-green-600 uppercase"
+                  >
+                    Temp. Max (°C)
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-semibold text-green-600 uppercase"
+                  >
+                    Temp. Min (°C)
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-semibold text-green-600 uppercase"
+                  >
+                    Niederschlag (mm)
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-semibold text-green-600 uppercase"
+                  >
+                    Sonne (h)
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-semibold text-green-600 uppercase"
+                  >
+                    Frost (Tage)
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-semibold text-green-600 uppercase"
+                  >
+                    Sommer (Tage)
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100 bg-white">
+                <tr
+                  v-for="aggregate in yearlyAggregates"
+                  :key="aggregate.year"
+                  @click="selectYearForMonthly(aggregate.year)"
+                  class="cursor-pointer hover:bg-green-50 transition-colors"
+                >
+                  <td class="px-4 py-3 text-sm font-medium text-gray-900">
+                    {{ aggregate.year }}
+                  </td>
+                  <td class="px-4 py-3 text-sm text-gray-700">
+                    {{ formatDecimal(aggregate.temperature?.mean, 1) }}
+                  </td>
+                  <td class="px-4 py-3 text-sm text-gray-700">
+                    {{ formatDecimal(aggregate.temperature?.max_absolute, 1) }}
+                  </td>
+                  <td class="px-4 py-3 text-sm text-gray-700">
+                    {{ formatDecimal(aggregate.temperature?.min_absolute, 1) }}
+                  </td>
+                  <td class="px-4 py-3 text-sm text-gray-700">
+                    {{ formatDecimal(aggregate.precipitation?.sum, 1) }}
+                  </td>
+                  <td class="px-4 py-3 text-sm text-gray-700">
+                    {{ formatDecimal(aggregate.sunshine_hours, 0) }}
+                  </td>
+                  <td class="px-4 py-3 text-sm text-gray-700">
+                    {{ aggregate.frost_days ?? "–" }}
+                  </td>
+                  <td class="px-4 py-3 text-sm text-gray-700">
+                    {{ aggregate.summer_days ?? "–" }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Monthly Aggregates Section -->
+        <div class="border-t pt-6" v-if="station && selectedYear && monthlyAggregates.length > 0">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-xl font-semibold text-gray-800">
+                Monatsaggregate {{ selectedYear }}
+              </h2>
+              <p class="text-sm text-gray-500">
+                Monatliche Zusammenfassung für das ausgewählte Jahr
+              </p>
+            </div>
+            <button
+              @click="selectedYear = null"
+              class="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+            >
+              Schließen
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-purple-50">
+                <tr>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-semibold text-purple-600 uppercase"
+                  >
+                    Monat
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-semibold text-purple-600 uppercase"
+                  >
+                    Temp. Ø (°C)
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-semibold text-purple-600 uppercase"
+                  >
+                    Temp. Max (°C)
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-semibold text-purple-600 uppercase"
+                  >
+                    Temp. Min (°C)
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-semibold text-purple-600 uppercase"
+                  >
+                    Niederschlag (mm)
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-semibold text-purple-600 uppercase"
+                  >
+                    Sonne (h)
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100 bg-white">
+                <tr
+                  v-for="month in monthlyAggregates"
+                  :key="month.month"
+                >
+                  <td class="px-4 py-3 text-sm font-medium text-gray-900">
+                    {{ month.month_name }}
+                  </td>
+                  <td class="px-4 py-3 text-sm text-gray-700">
+                    {{ formatDecimal(month.temperature?.mean, 1) }}
+                  </td>
+                  <td class="px-4 py-3 text-sm text-gray-700">
+                    {{ formatDecimal(month.temperature?.max_absolute, 1) }}
+                  </td>
+                  <td class="px-4 py-3 text-sm text-gray-700">
+                    {{ formatDecimal(month.temperature?.min_absolute, 1) }}
+                  </td>
+                  <td class="px-4 py-3 text-sm text-gray-700">
+                    {{ formatDecimal(month.precipitation?.sum, 1) }}
+                  </td>
+                  <td class="px-4 py-3 text-sm text-gray-700">
+                    {{ formatDecimal(month.sunshine_hours, 0) }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         <!-- Trends & Veränderungen Section -->
         <div class="border-t pt-6" v-if="station">
           <div class="flex items-center justify-between mb-4">
@@ -315,17 +495,21 @@ const error = ref<string | null>(null);
 const station = ref<Station | null>(null);
 const recentMeasurements = ref<Measurement[]>([]);
 const climateNormals = ref<any>(null);
+const yearlyAggregates = ref<any[]>([]);
+const monthlyAggregates = ref<any[]>([]);
+const selectedYear = ref<number | null>(null);
 
 const loadStationData = async (stationId: string) => {
   loading.value = true;
   error.value = null;
 
   try {
-    const [stationResponse, measurementsResponse, climateNormalsResponse] =
+    const [stationResponse, measurementsResponse, climateNormalsResponse, yearlyResponse] =
       await Promise.all([
         apiService.getStation(stationId),
         apiService.getMeasurementsByStation(stationId, { per_page: 10 }),
         apiService.getClimateNormals(), // Get all climate normals, filter client-side
+        apiService.getYearlyAggregates({ station_id: stationId, order: 'desc' }),
       ]);
 
     if (!stationResponse.success || !stationResponse.data) {
@@ -349,6 +533,13 @@ const loadStationData = async (stationId: string) => {
     } else {
       climateNormals.value = null;
     }
+
+    // Load yearly aggregates
+    if (yearlyResponse.success && yearlyResponse.data?.aggregates) {
+      yearlyAggregates.value = yearlyResponse.data.aggregates;
+    } else {
+      yearlyAggregates.value = [];
+    }
   } catch (err) {
     console.error("Error loading station details:", err);
     error.value =
@@ -358,16 +549,40 @@ const loadStationData = async (stationId: string) => {
     station.value = null;
     recentMeasurements.value = [];
     climateNormals.value = null;
+    yearlyAggregates.value = [];
   } finally {
     loading.value = false;
   }
 };
+
+// Load monthly aggregates when a year is selected
+watch(selectedYear, async (year) => {
+  if (year && station.value) {
+    try {
+      const response = await apiService.getMonthlyAggregates({
+        station_id: station.value.id,
+        year: year,
+      });
+      if (response.success && response.data?.aggregates) {
+        monthlyAggregates.value = response.data.aggregates;
+      } else {
+        monthlyAggregates.value = [];
+      }
+    } catch (err) {
+      console.error("Error loading monthly aggregates:", err);
+      monthlyAggregates.value = [];
+    }
+  } else {
+    monthlyAggregates.value = [];
+  }
+});
 
 watch(
   () => route.params.id,
   (id) => {
     if (typeof id === "string" && id) {
       loadStationData(id);
+      selectedYear.value = null;
     }
   },
   { immediate: true },
@@ -410,6 +625,15 @@ const formatNumber = (value?: number | null) => {
 const formatValue = (value?: number | string | null, unit = "") => {
   if (value === null || value === undefined || value === "") return "–";
   return `${value} ${unit}`.trim();
+};
+
+const formatDecimal = (value?: number | null, decimals = 1) => {
+  if (value === null || value === undefined) return "–";
+  return value.toFixed(decimals);
+};
+
+const selectYearForMonthly = (year: number) => {
+  selectedYear.value = year;
 };
 
 const viewCharts = () => {

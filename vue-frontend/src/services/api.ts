@@ -139,6 +139,33 @@ class ApiService {
     return response.data
   }
 
+  async getYearlyAggregates(params: {
+    station_id: string
+    start_year?: number
+    end_year?: number
+    order?: 'asc' | 'desc'
+  }): Promise<ApiResponse<any>> {
+    const response: AxiosResponse<ApiResponse<any>> = await this.client.get('/v1/statistics/yearly-aggregates', { params })
+    return response.data
+  }
+
+  async getMonthlyAggregates(params: {
+    station_id: string
+    year: number
+  }): Promise<ApiResponse<any>> {
+    const response: AxiosResponse<ApiResponse<any>> = await this.client.get('/v1/statistics/monthly-aggregates', { params })
+    return response.data
+  }
+
+  async getRankings(params: {
+    metric: string
+    station_id?: string
+    limit?: number
+  }): Promise<ApiResponse<any>> {
+    const response: AxiosResponse<ApiResponse<any>> = await this.client.get('/v1/statistics/rankings', { params })
+    return response.data
+  }
+
   // Measurements API - Additional methods
   async getLatestMeasurements(): Promise<ApiResponse<any>> {
     const response: AxiosResponse<ApiResponse<any>> = await this.client.get('/v1/measurements/latest')
